@@ -85,7 +85,7 @@ jobs:
           name: mtsn6-absen-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
 
-      - name: Upload APK directory info
+      - name: Upload build logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
