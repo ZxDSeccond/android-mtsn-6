@@ -1,4 +1,4 @@
-name: Build Android Release APK/AAB
+lname: Build Android Release APK/AAB
 
 on:
   workflow_dispatch:
@@ -36,6 +36,7 @@ jobs:
         run: npx cap sync android
 
       - name: Configure git
+        shell: bash
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
