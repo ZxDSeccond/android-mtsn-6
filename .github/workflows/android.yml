@@ -30,7 +30,7 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Setup Android SDK
+      - name: Setup Android SDK manually
         shell: bash
         run: |
           mkdir -p "$ANDROID_HOME"
@@ -71,7 +71,7 @@ jobs:
             npx cap add android
           fi
 
-      - name: Sync web assets to Android
+      - name: Sync UI to Android
         run: |
           npx cap sync android
 
@@ -80,9 +80,3 @@ jobs:
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: apk-debug-mtsn6
-          path: android/app/build/outputs/apk/debug/app-debug.apk
