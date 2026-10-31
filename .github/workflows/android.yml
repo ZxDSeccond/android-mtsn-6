@@ -20,7 +20,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
 
       - name: Install dependencies
         run: npm install
@@ -66,7 +65,7 @@ jobs:
             "platforms;android-34" \
             "build-tools;34.0.0"
 
-      - name: Generate Android project if missing
+      - name: Create Android project if missing
         run: |
           if [ ! -d "android" ]; then
             npx cap add android
