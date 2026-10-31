@@ -1,0 +1,85 @@
+:root {
+  --bg: #f8fafc;
+  --panel: rgba(255,255,255,0.85);
+  --line: rgba(148,163,184,0.25);
+  --emerald: #10b981;
+  --emerald-deep: #059669;
+  --sky: #38bdf8;
+  --violet: #8b5cf6;
+  --text: #0f172a;
+  --muted: #475569;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --shadow: 0 24px 50px rgba(15, 23, 42, 0.12);
+}
+
+* { box-sizing: border-box; }
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background:
+        radial-gradient(circle at top left, rgba(16,185,129,0.14), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(59,130,246,0.14), transparent 30%),
+        linear-gradient(180deg, #f8fafc 0%, #edf6f3 100%);
+    color: var(--text);
+}
+
+.glass-card {
+    background: rgba(255,255,255,0.86);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(148,163,184,0.22);
+    box-shadow: var(--shadow);
+}
+
+#reader video {
+    width: 100% !important;
+    height: 280px !important;
+    object-fit: cover;
+    border-radius: 1.1rem;
+    background: #0f172a;
+}
+
+.scan-frame {
+    background: linear-gradient(145deg, rgba(15,23,42,0.92), rgba(30,41,59,0.82));
+    border: 1px solid rgba(148,163,184,0.18);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+}
+
+@keyframes rgb-spin {
+    0% { transform: rotate(0deg) scale(1); filter: hue-rotate(0deg); }
+    50% { transform: rotate(180deg) scale(1.04); filter: hue-rotate(180deg); }
+    100% { transform: rotate(360deg) scale(1); filter: hue-rotate(360deg); }
+}
+
+@keyframes pulse-glow {
+    0%, 100% { opacity: 0.8; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.07); }
+}
+
+.rgb-loader {
+    animation: rgb-spin 2.2s linear infinite, pulse-glow 1.6s ease-in-out infinite;
+    background: linear-gradient(135deg, #10b981, #3b82f6, #ec4899, #8b5cf6, #10b981);
+    background-size: 300% 300%;
+}
+
+#splash-screen {
+    transition: opacity 0.55s ease-out, visibility 0.55s ease-out;
+}
+
+.soft-pill {
+    box-shadow: 0 8px 20px rgba(16,185,129,0.18);
+}
+
+.shadow-soft {
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+}
+
+.tiny-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 9999px;
+    display: inline-block;
+    background: #22c55e;
+    box-shadow: 0 0 18px rgba(34,197,94,0.9);
+}
