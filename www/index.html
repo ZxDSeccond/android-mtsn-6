@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        
+
         #reader video {
             width: 100% !important;
             height: auto !important;
@@ -42,7 +42,30 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
 
-    <!-- Splash Screen Loading RGB ZxD (3 Detik) -->
+    <div id="permission-modal" class="fixed inset-0 z-[60] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center px-5">
+        <div class="bg-white rounded-2xl p-5 w-full max-w-sm shadow-2xl border border-slate-200">
+            <div class="text-center mb-4">
+                <div class="mx-auto w-14 h-14 rounded-2xl bg-emerald-100 flex items-center justify-center mb-3">
+                    <span class="text-2xl">📷</span>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900">Izinkan akses</h3>
+            </div>
+
+            <p class="text-sm text-slate-600 leading-6 mb-5">
+                Aplikasi membutuhkan izin kamera untuk scan QR, serta izin file untuk membuka QR hasil download / galeri.
+            </p>
+
+            <div class="space-y-3">
+                <button id="grant-access-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-all">
+                    Izinkan Kamera & File
+                </button>
+                <button id="continue-without-camera-btn" class="w-full border border-slate-200 text-slate-700 font-semibold py-3 px-4 rounded-xl hover:bg-slate-50 transition-all">
+                    Lanjut tanpa kamera
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div id="splash-screen" class="fixed inset-0 z-50 bg-slate-900 flex flex-col items-center justify-center text-white">
         <div class="relative flex items-center justify-center mb-6">
             <div class="absolute w-24 h-24 rounded-full rgb-loader opacity-80 blur-sm"></div>
@@ -54,7 +77,6 @@
         <p class="text-xs text-emerald-400 font-medium animate-pulse">Memuat Sistem Absensi...</p>
     </div>
 
-    <!-- Header Modern -->
     <header class="w-full bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
         <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-2.5">
@@ -72,7 +94,6 @@
         </div>
     </header>
 
-    <!-- Tab Navigasi -->
     <div class="max-w-md w-full mx-auto px-4 mt-4">
         <div class="bg-slate-200/70 p-1 rounded-xl flex shadow-inner">
             <button onclick="switchTab('scanner')" id="tab-scanner-btn" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-white text-emerald-700 shadow-sm transition-all duration-200">
@@ -84,10 +105,7 @@
         </div>
     </div>
 
-    <!-- Konten Utama -->
     <main class="max-w-md w-full mx-auto p-4 flex-1 flex flex-col justify-center">
-        
-        <!-- View Scanner -->
         <div id="view-scanner" class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
             <div class="flex items-center justify-between mb-3">
                 <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Kamera Scanner Guru</h2>
@@ -98,6 +116,16 @@
 
             <div id="reader" class="w-full rounded-xl overflow-hidden border border-slate-200 bg-slate-900 mb-3"></div>
 
+            <div class="flex gap-2 mb-3">
+                <button id="btn-upload-qr" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 transition-all">
+                    📁 Pilih File QR
+                </button>
+                <input id="file-qrcode-input" type="file" accept="image/*" class="hidden" />
+                <button onclick="requestCameraAccess()" class="flex-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-emerald-200 transition-all">
+                    🎥 Kamera
+                </button>
+            </div>
+
             <div id="result-container" class="hidden mt-3 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-center">
                 <span class="inline-block text-emerald-700 font-bold text-sm mb-1">✨ Absen Berhasil Tercatat!</span>
                 <p id="student-info" class="text-xs text-slate-600 mb-3 font-medium"></p>
@@ -106,27 +134,26 @@
                 </div>
             </div>
 
-            <button id="btn-rescan" onclick="location.reload()" class="hidden mt-3 w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2.5 px-4 rounded-xl shadow-md shadow-emerald-600/20 transition-all">
+            <button id="btn-rescan" onclick="location.reload()" class="hidden mt-3 w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2.5 px-4 rounded-xl shadow-md shadow-emerald-600/20">
                 Scan Siswa Lain
             </button>
         </div>
 
-        <!-- View Generator -->
         <div id="view-generator" class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm hidden">
             <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Form Data Kartu Siswa</h2>
-            
+
             <div class="space-y-3.5 text-xs">
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1.5">Nama Lengkap Siswa</label>
-                    <input type="text" id="gen-nama" placeholder="Contoh: Zidan Ramadan" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all">
+                    <input type="text" id="gen-nama" placeholder="Contoh: Zidan Ramadan" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
                 </div>
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1.5">Kelas</label>
-                    <input type="text" id="gen-kelas" placeholder="Contoh: IX-A" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all">
+                    <input type="text" id="gen-kelas" placeholder="Contoh: IX-A" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
                 </div>
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1.5">No. WhatsApp Orang Tua</label>
-                    <input type="text" id="gen-hp" placeholder="Contoh: 6281234567890" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all">
+                    <input type="text" id="gen-hp" placeholder="Contoh: 6281234567890" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
                 </div>
                 <button onclick="generateQRCode()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-md shadow-emerald-600/20 transition-all mt-1">
                     Generate QR Code Kartu 📱
@@ -143,21 +170,14 @@
 
     </main>
 
-    <!-- Footer Copyright -->
     <footer class="w-full py-4 text-center text-[11px] text-slate-400 border-t border-slate-200/60 mt-auto bg-white">
         &copy; 2026 ZxD ~ MTsN 6 Solok, Sumatera Barat &bull; Secure Apps
     </footer>
 
-    <!-- Skrip Logika -->
     <script>
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const splash = document.getElementById('splash-screen');
-                splash.style.opacity = '0';
-                splash.style.visibility = 'hidden';
-                setTimeout(initScanner, 300);
-            }, 3000);
-        });
+        let qrInstance = null;
+        let html5QrCode = null;
+        let isScanned = false;
 
         function switchTab(tab) {
             const scannerView = document.getElementById('view-scanner');
@@ -178,7 +198,129 @@
             }
         }
 
-        let qrInstance = null;
+        function showPermissionModal() {
+            document.getElementById('permission-modal').classList.remove('hidden');
+        }
+
+        function hidePermissionModal() {
+            document.getElementById('permission-modal').classList.add('hidden');
+        }
+
+        async function requestCameraAccess() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert('Browser Anda tidak mendukung kamera. Gunakan file QR dari galeri.');
+                return;
+            }
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: { ideal: 'environment' },
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: false
+                });
+
+                stream.getTracks().forEach(track => track.stop());
+                hidePermissionModal();
+                initScanner();
+            } catch (error) {
+                console.error('Camera permission denied:', error);
+                alert('Akses kamera ditolak. Anda tetap bisa memilih file QR dari perangkat.');
+                hidePermissionModal();
+            }
+        }
+
+        function setupPermissionFlow() {
+            const grantBtn = document.getElementById('grant-access-btn');
+            const continueBtn = document.getElementById('continue-without-camera-btn');
+
+            grantBtn.addEventListener('click', requestCameraAccess);
+            continueBtn.addEventListener('click', () => {
+                hidePermissionModal();
+                initScanner();
+            });
+        }
+
+        function handleDecodedData(decodedText) {
+            if (isScanned) return;
+            isScanned = true;
+
+            if (html5QrCode) {
+                html5QrCode.stop().catch(err => console.log(err));
+            }
+
+            let dataParts = decodedText.split("|");
+            let nama = dataParts[0] ? dataParts[0].trim() : "Siswa";
+            let kelas = dataParts[1] ? dataParts[1].trim() : "-";
+            let noOrtu = dataParts[2] ? dataParts[2].trim() : "";
+
+            document.getElementById("student-info").innerHTML = `
+                <strong>${nama}</strong> <br> Kelas: ${kelas}
+            `;
+
+            let pesanWA = `${nama} hadir!`;
+            let encodedPesan = encodeURIComponent(pesanWA);
+            let waUrl = `https://api.whatsapp.com/send?phone=${noOrtu}&text=${encodedPesan}`;
+
+            document.getElementById("result-container").classList.remove("hidden");
+            document.getElementById("btn-rescan").classList.remove("hidden");
+
+            setTimeout(() => {
+                window.location.href = waUrl;
+            }, 1000);
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            handleDecodedData(decodedText);
+        }
+
+        function onScanFailure(error) {
+            // ignore scan failures while camera keep running
+        }
+
+        async function scanFileQRCode(file) {
+            if (!file) return;
+
+            try {
+                if (html5QrCode) {
+                    try { await html5QrCode.stop(); } catch (e) {}
+                }
+
+                html5QrCode = new Html5Qrcode("reader");
+                const decodedText = await html5QrCode.scanFile(file, true);
+                handleDecodedData(decodedText);
+            } catch (error) {
+                console.error('File QR error:', error);
+                alert('QR dari file tidak terbaca. Coba file gambar QR yang lain.');
+            }
+        }
+
+        function initScanner() {
+            if (html5QrCode) {
+                try { html5QrCode.stop(); } catch (e) {}
+            }
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert('Browser tidak mendukung kamera, silakan pilih file QR.');
+                return;
+            }
+
+            html5QrCode = new Html5Qrcode("reader");
+            const config = { fps: 20, qrbox: { width: 240, height: 240 } };
+
+            html5QrCode.start(
+                { facingMode: "environment" },
+                config,
+                onScanSuccess,
+                onScanFailure
+            ).catch(err => {
+                console.log('Kamera error/izin ditolak: ', err);
+                alert('Akses kamera ditolak. Anda bisa memilih file QR dari galeri.');
+            });
+        }
+
         function generateQRCode() {
             let nama = document.getElementById('gen-nama').value.trim();
             let kelas = document.getElementById('gen-kelas').value.trim();
@@ -197,9 +339,9 @@
                 text: combinedData,
                 width: 200,
                 height: 200,
-                colorDark : "#0f172a",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.H
+                colorDark: '#0f172a',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
             });
 
             document.getElementById('qrcode-container').classList.remove('hidden');
@@ -207,10 +349,10 @@
             setTimeout(() => {
                 let img = qrElement.querySelector('img') || qrElement.querySelector('canvas');
                 let downloadBtn = document.getElementById('download-btn');
-                
+
                 if (img) {
                     if (img.tagName === 'CANVAS') {
-                        downloadBtn.href = img.toDataURL("image/png");
+                        downloadBtn.href = img.toDataURL('image/png');
                     } else {
                         downloadBtn.href = img.src;
                     }
@@ -219,57 +361,33 @@
             }, 400);
         }
 
-        let html5QrCode = null;
-        let isScanned = false;
+        function bindFileUpload() {
+            const fileInput = document.getElementById('file-qrcode-input');
+            const fileButton = document.getElementById('btn-upload-qr');
 
-        function initScanner() {
-            if (html5QrCode) {
-                try { html5QrCode.stop(); } catch(e) {}
-            }
-
-            html5QrCode = new Html5Qrcode("reader");
-            const config = { fps: 20, qrbox: { width: 240, height: 240 } };
-            
-            html5QrCode.start(
-                { facingMode: "environment" }, 
-                config, 
-                onScanSuccess, 
-                onScanFailure
-            ).catch(err => {
-                console.log("Kamera error/izin ditolak: ", err);
+            fileButton.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', (event) => {
+                const file = event.target.files && event.target.files[0];
+                if (file) {
+                    scanFileQRCode(file);
+                }
             });
         }
 
-        function onScanSuccess(decodedText, decodedResult) {
-            if (isScanned) return;
-            isScanned = true;
-
-            if (html5QrCode) {
-                html5QrCode.stop().catch(err => console.log(err));
-            }
-
-            let dataParts = decodedText.split("|");
-            let nama = dataParts[0] ? dataParts[0].trim() : "Siswa";
-            let kelas = dataParts[1] ? dataParts[1].trim() : "-";
-            let noOrtu = dataParts[2] ? dataParts[2].trim() : "";
-
-            document.getElementById("student-info").innerHTML = `
-                <strong>${nama}</strong> <br> Kelas: ${kelas}
-            `;
-            
-            let pesanWA = `${nama} hadir!`;
-            let encodedPesan = encodeURIComponent(pesanWA);
-            let waUrl = `https://api.whatsapp.com/send?phone=${noOrtu}&text=${encodedPesan}`;
-
-            document.getElementById("result-container").classList.remove("hidden");
-            document.getElementById("btn-rescan").classList.remove("hidden");
+        window.addEventListener('load', () => {
+            setupPermissionFlow();
+            bindFileUpload();
 
             setTimeout(() => {
-                window.location.href = waUrl;
-            }, 1000);
-        }
+                const splash = document.getElementById('splash-screen');
+                splash.style.opacity = '0';
+                splash.style.visibility = 'hidden';
 
-        function onScanFailure(error) {}
+                setTimeout(() => {
+                    showPermissionModal();
+                }, 300);
+            }, 1500);
+        });
     </script>
 </body>
 </html>
