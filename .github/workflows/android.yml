@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Android APK Pure Gradle
 
 on:
   push:
@@ -18,40 +18,30 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 18
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
 
-    - name: Locate Project Root & Install Dependencies
+    - name: Copy Web Files to Android Assets
       run: |
-        # Cari letak package.json secara otomatis di root atau subfolder
-        if [ -f "package.json" ]; then
-          echo "Found package.json in root"
-        elif [ -f "android-mtsn-6/package.json" ]; then
-          cd android-mtsn-6
-          echo "Moved to android-mtsn-6"
+        # Buat otomatis folder assets Android dan salin file web kamu ke dalam APK
+        mkdir -p android/app/src/main/assets/public
+        
+        # Cek apakah folder www ada, lalu salin isinya
+        if [ -d "www" ]; then
+          cp -r www/* android/app/src/main/assets/public/
+        elif [ -d "android-mtsn-6/www" ]; then
+          cp -r android-mtsn-6/www/* android/app/src/main/assets/public/
+        fi
+
+    - name: Build APK with Gradle
+      run: |
+        # Masuk ke folder android lalu build APK debug
+        if [ -d "android" ]; then
+          cd android
+        elif [ -d "android-mtsn-6/android" ]; then
+          cd android-mtsn-6/android
         fi
         
-        npm install --legacy-peer-deps
-        npx cap init --yes --force || true
-
-    - name: Add Android Platform & Sync
-      run: |
-        if [ -d "android-mtsn-6" ]; then
-          cd android-mtsn-6
-        fi
-        
-        npx cap add android || true
-        npx cap sync android
-
-    - name: Build Debug APK
-      run: |
-        if [ -d "android-mtsn-6" ]; then
-          cd android-mtsn-6
-        fi
-        
-        cd android
         chmod +x gradlew
         ./gradlew assembleDebug
 
