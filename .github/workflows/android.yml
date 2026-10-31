@@ -35,7 +35,23 @@ jobs:
       - name: Sync Capacitor project
         run: npx cap sync android
 
-      - name: Decode keystore from GitHub secret
+      - name: Configure git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit Android project to repo if needed
+        shell: bash
+        run: |
+          if [ -d "android" ]; then
+            git add android
+            if ! git diff --cached --quiet; then
+              git commit -m "Add generated Android project"
+              git push
+            fi
+          fi
+
+      - name: Decode keystore from secret
         shell: bash
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/release-keystore.jks
