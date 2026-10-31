@@ -1,5 +1,8 @@
 name: Build Android Release APK/AAB
 
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:
 
@@ -43,12 +46,14 @@ jobs:
 
       - name: Commit Android project to repo if needed
         shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ -d "android" ]; then
             git add android
             if ! git diff --cached --quiet; then
               git commit -m "Add generated Android project"
-              git push
+              git push https://x-access-token:${GITHUB_TOKEN}@github.com/ZxDSeccond/android-mtsn-6.git HEAD:${{ github.ref_name }}
             fi
           fi
 
