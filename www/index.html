@@ -7,59 +7,117 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        :root {
+            --bg: #f8fafc;
+            --panel: rgba(255,255,255,0.85);
+            --line: rgba(148,163,184,0.25);
+            --emerald: #10b981;
+            --emerald-deep: #059669;
+            --sky: #38bdf8;
+            --violet: #8b5cf6;
+            --text: #0f172a;
+            --muted: #475569;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow: 0 24px 50px rgba(15, 23, 42, 0.12);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(16,185,129,0.14), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(59,130,246,0.14), transparent 30%),
+                linear-gradient(180deg, #f8fafc 0%, #edf6f3 100%);
+            color: var(--text);
+        }
+
+        .glass-card {
+            background: rgba(255,255,255,0.86);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(148,163,184,0.22);
+            box-shadow: var(--shadow);
+        }
 
         #reader video {
             width: 100% !important;
             height: auto !important;
             object-fit: cover;
-            border-radius: 0.75rem;
+            border-radius: 1.1rem;
+            background: #0f172a;
+        }
+
+        .scan-frame {
+            background: linear-gradient(145deg, rgba(15,23,42,0.92), rgba(30,41,59,0.82));
+            border: 1px solid rgba(148,163,184,0.18);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
         }
 
         @keyframes rgb-spin {
-            0% { transform: rotate(0deg); filter: hue-rotate(0deg); }
-            50% { transform: rotate(180deg); filter: hue-rotate(180deg); }
-            100% { transform: rotate(360deg); filter: hue-rotate(360deg); }
+            0% { transform: rotate(0deg) scale(1); filter: hue-rotate(0deg); }
+            50% { transform: rotate(180deg) scale(1.04); filter: hue-rotate(180deg); }
+            100% { transform: rotate(360deg) scale(1); filter: hue-rotate(360deg); }
         }
 
         @keyframes pulse-glow {
             0%, 100% { opacity: 0.8; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.05); }
+            50% { opacity: 1; transform: scale(1.07); }
         }
 
         .rgb-loader {
-            animation: rgb-spin 2s linear infinite, pulse-glow 1.5s ease-in-out infinite;
+            animation: rgb-spin 2.2s linear infinite, pulse-glow 1.6s ease-in-out infinite;
             background: linear-gradient(135deg, #10b981, #3b82f6, #ec4899, #8b5cf6, #10b981);
             background-size: 300% 300%;
         }
 
         #splash-screen {
-            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+            transition: opacity 0.55s ease-out, visibility 0.55s ease-out;
+        }
+
+        .soft-pill {
+            box-shadow: 0 8px 20px rgba(16,185,129,0.18);
+        }
+
+        .shadow-soft {
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+        }
+
+        .tiny-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 9999px;
+            display: inline-block;
+            background: #22c55e;
+            box-shadow: 0 0 18px rgba(34,197,94,0.9);
         }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
 
-    <div id="permission-modal" class="fixed inset-0 z-[60] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center px-5">
-        <div class="bg-white rounded-2xl p-5 w-full max-w-sm shadow-2xl border border-slate-200">
-            <div class="text-center mb-4">
-                <div class="mx-auto w-14 h-14 rounded-2xl bg-emerald-100 flex items-center justify-center mb-3">
-                    <span class="text-2xl">📷</span>
+    <div id="permission-modal" class="fixed inset-0 z-[60] bg-slate-950/75 backdrop-blur-sm flex items-center justify-center px-5">
+        <div class="glass-card rounded-[28px] p-5 w-full max-w-sm">
+            <div class="text-center mb-5">
+                <div class="mx-auto w-16 h-16 rounded-[22px] bg-gradient-to-br from-emerald-100 via-emerald-50 to-sky-100 flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/15">
+                    <span class="text-3xl">📷</span>
                 </div>
-                <h3 class="text-lg font-bold text-slate-900">Izinkan akses</h3>
+                <h3 class="text-xl font-extrabold text-slate-900 tracking-tight">Izinkan akses aplikasi</h3>
             </div>
 
-            <p class="text-sm text-slate-600 leading-6 mb-5">
-                Aplikasi membutuhkan izin kamera untuk scan QR, serta izin file untuk membuka QR hasil download / galeri.
-            </p>
+            <div class="rounded-2xl bg-slate-50 border border-slate-200 p-3 mb-4">
+                <p class="text-sm text-slate-600 leading-6">
+                    Aplikasi membutuhkan akses <span class="font-bold text-slate-800">kamera</span> untuk scan QR siswa dan akses <span class="font-bold text-slate-800">file</span> untuk membuka QR dari galeri atau menyimpan hasil QR ke perangkat.
+                </p>
+            </div>
 
             <div class="space-y-3">
-                <button id="grant-access-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-all">
+                <button id="grant-access-btn" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-emerald-600/20 transition-all duration-200">
                     Izinkan Kamera & File
                 </button>
-                <button id="continue-without-camera-btn" class="w-full border border-slate-200 text-slate-700 font-semibold py-3 px-4 rounded-xl hover:bg-slate-50 transition-all">
+                <button id="continue-without-camera-btn" class="w-full border border-slate-200 text-slate-700 font-semibold py-3.5 px-4 rounded-2xl hover:bg-slate-50 transition-all duration-200">
                     Lanjut tanpa kamera
                 </button>
             </div>
@@ -69,108 +127,110 @@
     <div id="splash-screen" class="fixed inset-0 z-50 bg-slate-900 flex flex-col items-center justify-center text-white">
         <div class="relative flex items-center justify-center mb-6">
             <div class="absolute w-24 h-24 rounded-full rgb-loader opacity-80 blur-sm"></div>
-            <div class="relative w-20 h-20 bg-slate-900 rounded-2xl border-2 border-emerald-500/50 flex items-center justify-center shadow-2xl">
+            <div class="relative w-20 h-20 bg-slate-900 rounded-[26px] border-2 border-emerald-400/60 flex items-center justify-center shadow-2xl">
                 <span class="text-2xl font-black bg-gradient-to-r from-emerald-400 via-sky-400 to-pink-500 bg-clip-text text-transparent">ZxD</span>
             </div>
         </div>
-        <h2 class="text-lg font-bold tracking-wider text-slate-100 mb-1">MTsN 6 SOLOK</h2>
-        <p class="text-xs text-emerald-400 font-medium animate-pulse">Memuat Sistem Absensi...</p>
+        <h2 class="text-lg font-bold tracking-[0.22em] text-slate-100 mb-2">MTsN 6 SOLOK</h2>
+        <p class="text-xs text-emerald-300 font-semibold animate-pulse">Memuat Sistem Absensi...</p>
     </div>
 
-    <header class="w-full bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <header class="w-full bg-white/70 backdrop-blur-xl border-b border-slate-200/80 sticky top-0 z-40">
         <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-2.5">
-                <div class="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold shadow-md shadow-emerald-600/20">
+            <div class="flex items-center space-x-3">
+                <div class="w-11 h-11 rounded-[18px] bg-gradient-to-br from-emerald-500 via-emerald-600 to-sky-500 flex items-center justify-center text-white font-black shadow-lg shadow-emerald-600/25">
                     M6
                 </div>
                 <div>
-                    <h1 class="text-sm font-bold text-slate-900 leading-tight">MTsN 6 Solok</h1>
-                    <p class="text-[11px] text-emerald-600 font-medium">Sistem Absensi & Kartu Siswa</p>
+                    <h1 class="text-sm font-extrabold text-slate-900 leading-tight">MTsN 6 Solok</h1>
+                    <p class="text-[11px] font-semibold text-emerald-600">Sistem Absensi & Kartu Siswa</p>
                 </div>
             </div>
-            <span class="text-[10px] bg-emerald-50 text-emerald-700 font-semibold px-2.5 py-1 rounded-full border border-emerald-200/60">
-                v2.6 Live
+            <span class="soft-pill text-[10px] bg-gradient-to-r from-emerald-50 to-emerald-100 text-emerald-700 font-bold px-2.5 py-1.5 rounded-full border border-emerald-200">
+                v2.7 Live
             </span>
         </div>
     </header>
 
     <div class="max-w-md w-full mx-auto px-4 mt-4">
-        <div class="bg-slate-200/70 p-1 rounded-xl flex shadow-inner">
-            <button onclick="switchTab('scanner')" id="tab-scanner-btn" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-white text-emerald-700 shadow-sm transition-all duration-200">
+        <div class="glass-card p-1.5 rounded-2xl flex shadow-soft border border-slate-200/60">
+            <button onclick="switchTab('scanner')" id="tab-scanner-btn" class="flex-1 py-2.5 text-xs font-bold rounded-xl bg-white text-emerald-700 shadow-sm transition-all duration-200">
                 📷 Scan Absen
             </button>
-            <button onclick="switchTab('generator')" id="tab-generator-btn" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all duration-200">
+            <button onclick="switchTab('generator')" id="tab-generator-btn" class="flex-1 py-2.5 text-xs font-bold rounded-xl text-slate-600 hover:text-slate-900 transition-all duration-200">
                 🪪 Buat QR Kartu
             </button>
         </div>
     </div>
 
     <main class="max-w-md w-full mx-auto p-4 flex-1 flex flex-col justify-center">
-        <div id="view-scanner" class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
+        <div id="view-scanner" class="glass-card border border-slate-200/80 rounded-[28px] p-4 shadow-soft">
             <div class="flex items-center justify-between mb-3">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Kamera Scanner Guru</h2>
-                <button onclick="initScanner()" class="text-xs text-emerald-600 font-semibold hover:underline">
+                <div class="flex items-center gap-2">
+                    <span class="tiny-dot"></span>
+                    <h2 class="text-[11px] font-extrabold uppercase tracking-[0.18em] text-slate-500">Kamera Scanner Guru</h2>
+                </div>
+                <button onclick="initScanner()" class="text-[11px] text-emerald-600 font-bold hover:underline">
                     Reset Kamera 🔄
                 </button>
             </div>
 
-            <div id="reader" class="w-full rounded-xl overflow-hidden border border-slate-200 bg-slate-900 mb-3"></div>
+            <div id="reader" class="scan-frame w-full rounded-[22px] overflow-hidden border border-slate-700/50 bg-slate-900 mb-3"></div>
 
-            <div class="flex gap-2 mb-3">
-                <button id="btn-upload-qr" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 transition-all">
+            <div class="grid grid-cols-2 gap-2 mb-3">
+                <button id="btn-upload-qr" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold py-2.5 px-3 rounded-2xl border border-slate-200 transition-all duration-200">
                     📁 Pilih File QR
                 </button>
                 <input id="file-qrcode-input" type="file" accept="image/*" class="hidden" />
-                <button onclick="requestCameraAccess()" class="flex-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-emerald-200 transition-all">
+                <button onclick="requestCameraAccess()" class="bg-gradient-to-r from-emerald-100 to-emerald-50 hover:from-emerald-200 hover:to-emerald-100 text-emerald-700 text-[11px] font-bold py-2.5 px-3 rounded-2xl border border-emerald-200 transition-all duration-200">
                     🎥 Kamera
                 </button>
             </div>
 
-            <div id="result-container" class="hidden mt-3 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-center">
-                <span class="inline-block text-emerald-700 font-bold text-sm mb-1">✨ Absen Berhasil Tercatat!</span>
-                <p id="student-info" class="text-xs text-slate-600 mb-3 font-medium"></p>
-                <div class="inline-flex items-center text-xs text-emerald-600 font-semibold bg-white px-3 py-1.5 rounded-lg border border-emerald-200 shadow-sm">
+            <div id="result-container" class="hidden mt-3 p-4 bg-gradient-to-r from-emerald-50 to-emerald-100 border border-emerald-200 rounded-2xl text-center shadow-sm">
+                <span class="inline-block text-emerald-700 font-black text-sm mb-2">✨ Absen Berhasil Tercatat!</span>
+                <p id="student-info" class="text-xs text-slate-600 mb-3 font-semibold"></p>
+                <div class="inline-flex items-center text-[11px] text-emerald-700 font-bold bg-white px-3 py-1.5 rounded-xl border border-emerald-200 shadow-sm">
                     Membuka WhatsApp otomatis... 🚀
                 </div>
             </div>
 
-            <button id="btn-rescan" onclick="location.reload()" class="hidden mt-3 w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2.5 px-4 rounded-xl shadow-md shadow-emerald-600/20">
+            <button id="btn-rescan" onclick="location.reload()" class="hidden mt-3 w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white text-[11px] font-bold py-2.5 px-4 rounded-2xl shadow-lg shadow-emerald-600/20 transition-all duration-200">
                 Scan Siswa Lain
             </button>
         </div>
 
-        <div id="view-generator" class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm hidden">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Form Data Kartu Siswa</h2>
+        <div id="view-generator" class="glass-card border border-slate-200/80 rounded-[28px] p-4 shadow-soft hidden">
+            <h2 class="text-[11px] font-extrabold uppercase tracking-[0.18em] text-slate-500 mb-4">Form Data Kartu Siswa</h2>
 
             <div class="space-y-3.5 text-xs">
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1.5">Nama Lengkap Siswa</label>
-                    <input type="text" id="gen-nama" placeholder="Contoh: Zidan Ramadan" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
+                    <label class="block font-bold text-slate-700 mb-1.5">Nama Lengkap Siswa</label>
+                    <input type="text" id="gen-nama" placeholder="Contoh: Zidan Ramadan" class="w-full px-3.5 py-2.75 rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-400 transition-all">
                 </div>
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1.5">Kelas</label>
-                    <input type="text" id="gen-kelas" placeholder="Contoh: IX-A" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
+                    <label class="block font-bold text-slate-700 mb-1.5">Kelas</label>
+                    <input type="text" id="gen-kelas" placeholder="Contoh: IX-A" class="w-full px-3.5 py-2.75 rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-400 transition-all">
                 </div>
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1.5">No. WhatsApp Orang Tua</label>
-                    <input type="text" id="gen-hp" placeholder="Contoh: 6281234567890" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
+                    <label class="block font-bold text-slate-700 mb-1.5">No. WhatsApp Orang Tua</label>
+                    <input type="text" id="gen-hp" placeholder="Contoh: 6281234567890" class="w-full px-3.5 py-2.75 rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-400 transition-all">
                 </div>
-                <button onclick="generateQRCode()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-md shadow-emerald-600/20 transition-all mt-1">
+                <button onclick="generateQRCode()" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-3 rounded-2xl shadow-lg shadow-emerald-600/20 transition-all mt-1">
                     Generate QR Code Kartu 📱
                 </button>
             </div>
 
             <div id="qrcode-container" class="mt-5 flex flex-col items-center hidden pt-4 border-t border-slate-100">
-                <div id="qrcode" class="p-3 bg-white rounded-2xl border border-slate-200 shadow-sm mb-3"></div>
-                <a id="download-btn" class="w-full text-center bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold py-2.5 px-4 rounded-xl shadow transition-all cursor-pointer">
+                <div id="qrcode" class="p-3 bg-white rounded-[24px] border border-slate-200 shadow-md mb-3"></div>
+                <button id="download-btn" class="w-full bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold py-2.5 px-4 rounded-2xl shadow transition-all cursor-pointer">
                     Download Gambar QR (.PNG) 📥
-                </a>
+                </button>
             </div>
         </div>
-
     </main>
 
-    <footer class="w-full py-4 text-center text-[11px] text-slate-400 border-t border-slate-200/60 mt-auto bg-white">
+    <footer class="w-full py-4 text-center text-[11px] text-slate-400 border-t border-slate-200/60 mt-auto bg-white/70 backdrop-blur-xl">
         &copy; 2026 ZxD ~ MTsN 6 Solok, Sumatera Barat &bull; Secure Apps
     </footer>
 
@@ -178,6 +238,32 @@
         let qrInstance = null;
         let html5QrCode = null;
         let isScanned = false;
+
+        function showToast(message, type = 'info') {
+            let toast = document.getElementById('live-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'live-toast';
+                toast.className = 'fixed left-1/2 -translate-x-1/2 bottom-24 z-[80] max-w-[90%] px-3 py-2 text-[11px] font-semibold rounded-full border shadow-lg opacity-0 transition-all duration-300';
+                toast.style.backdropFilter = 'blur(10px)';
+                document.body.appendChild(toast);
+            }
+
+            const palette = {
+                info: 'bg-slate-900 text-white border-slate-700',
+                success: 'bg-emerald-600 text-white border-emerald-500',
+                danger: 'bg-red-500 text-white border-red-400'
+            };
+
+            toast.className = `fixed left-1/2 -translate-x-1/2 bottom-24 z-[80] max-w-[90%] px-3 py-2 text-[11px] font-semibold rounded-full border shadow-lg opacity-100 transition-all duration-300 ${palette[type] || palette.info}`;
+            toast.textContent = message;
+
+            clearTimeout(showToast.timeoutId);
+            showToast.timeoutId = setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 2200);
+        }
 
         function switchTab(tab) {
             const scannerView = document.getElementById('view-scanner');
@@ -188,13 +274,13 @@
             if (tab === 'scanner') {
                 scannerView.classList.remove('hidden');
                 generatorView.classList.add('hidden');
-                scannerBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-white text-emerald-700 shadow-sm transition-all duration-200";
-                generatorBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all duration-200";
+                scannerBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl bg-white text-emerald-700 shadow-sm transition-all duration-200";
+                generatorBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl text-slate-600 hover:text-slate-900 transition-all duration-200";
             } else {
                 scannerView.classList.add('hidden');
                 generatorView.classList.remove('hidden');
-                generatorBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-white text-emerald-700 shadow-sm transition-all duration-200";
-                scannerBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all duration-200";
+                generatorBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl bg-white text-emerald-700 shadow-sm transition-all duration-200";
+                scannerBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl text-slate-600 hover:text-slate-900 transition-all duration-200";
             }
         }
 
@@ -206,14 +292,23 @@
             document.getElementById('permission-modal').classList.add('hidden');
         }
 
+        function normalizePhoneNumber(phone) {
+            if (!phone) return '';
+            const cleaned = phone.toString().replace(/\D/g, '');
+            if (!cleaned) return '';
+            if (cleaned.startsWith('62')) return cleaned;
+            if (cleaned.startsWith('0')) return `62${cleaned.slice(1)}`;
+            return cleaned.startsWith('8') ? `62${cleaned}` : cleaned;
+        }
+
         async function requestCameraAccess() {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                alert('Browser Anda tidak mendukung kamera. Gunakan file QR dari galeri.');
+                showToast('Browser Anda tidak mendukung kamera. Coba pilih file QR dari galeri.', 'danger');
                 return;
             }
 
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({
+               const stream = await navigator.mediaDevices.getUserMedia({
                     video: {
                         facingMode: { ideal: 'environment' },
                         width: { ideal: 1280 },
@@ -224,12 +319,30 @@
 
                 stream.getTracks().forEach(track => track.stop());
                 hidePermissionModal();
+                showToast('Akses kamera berhasil diizinkan.', 'success');
                 initScanner();
             } catch (error) {
                 console.error('Camera permission denied:', error);
-                alert('Akses kamera ditolak. Anda tetap bisa memilih file QR dari perangkat.');
                 hidePermissionModal();
+                showToast('Kamera tidak diizinkan. Anda masih bisa pilih file QR.', 'info');
             }
+        }
+
+        function bindFileUpload() {
+            const fileInput = document.getElementById('file-qrcode-input');
+            const fileButton = document.getElementById('btn-upload-qr');
+
+            fileButton.addEventListener('click', () => {
+                fileInput.click();
+                showToast('Pilih file QR dari galeri perangkat.', 'info');
+            });
+
+            fileInput.addEventListener('change', (event) => {
+                const file = event.target.files && event.target.files[0];
+                if (file) {
+                    scanFileQRCode(file);
+                }
+            });
         }
 
         function setupPermissionFlow() {
@@ -239,7 +352,7 @@
             grantBtn.addEventListener('click', requestCameraAccess);
             continueBtn.addEventListener('click', () => {
                 hidePermissionModal();
-                initScanner();
+                showToast('Akses kamera dibatalkan. Anda bisa tetap memilih file QR.', 'info');
             });
         }
 
@@ -251,32 +364,32 @@
                 html5QrCode.stop().catch(err => console.log(err));
             }
 
-            let dataParts = decodedText.split("|");
-            let nama = dataParts[0] ? dataParts[0].trim() : "Siswa";
-            let kelas = dataParts[1] ? dataParts[1].trim() : "-";
-            let noOrtu = dataParts[2] ? dataParts[2].trim() : "";
+            const dataParts = decodedText.split('|');
+            const nama = dataParts[0] ? dataParts[0].trim() : 'Siswa';
+            const kelas = dataParts[1] ? dataParts[1].trim() : '-';
+            const noOrtu = normalizePhoneNumber(dataParts[2] ? dataParts[2].trim() : '');
 
-            document.getElementById("student-info").innerHTML = `
+            document.getElementById('student-info').innerHTML = `
                 <strong>${nama}</strong> <br> Kelas: ${kelas}
             `;
 
-            let pesanWA = `${nama} hadir!`;
-            let encodedPesan = encodeURIComponent(pesanWA);
-            let waUrl = `https://api.whatsapp.com/send?phone=${noOrtu}&text=${encodedPesan}`;
+            const pesanWA = `${nama} hadir!`;
+            const encodedPesan = encodeURIComponent(pesanWA);
+            const waUrl = noOrtu ? `https://api.whatsapp.com/send?phone=${noOrtu}&text=${encodedPesan}` : `https://api.whatsapp.com/send?text=${encodedPesan}`;
 
-            document.getElementById("result-container").classList.remove("hidden");
-            document.getElementById("btn-rescan").classList.remove("hidden");
+            document.getElementById('result-container').classList.remove('hidden');
+            document.getElementById('btn-rescan').classList.remove('hidden');
 
             setTimeout(() => {
                 window.location.href = waUrl;
             }, 1000);
         }
 
-        function onScanSuccess(decodedText, decodedResult) {
+        function onScanSuccess(decodedText) {
             handleDecodedData(decodedText);
         }
 
-        function onScanFailure(error) {
+        function onScanFailure() {
             // ignore scan failures while camera keep running
         }
 
@@ -288,7 +401,7 @@
                     try { await html5QrCode.stop(); } catch (e) {}
                 }
 
-                html5QrCode = new Html5Qrcode("reader");
+                html5QrCode = new Html5Qrcode('reader');
                 const decodedText = await html5QrCode.scanFile(file, true);
                 handleDecodedData(decodedText);
             } catch (error) {
@@ -303,21 +416,21 @@
             }
 
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                alert('Browser tidak mendukung kamera, silakan pilih file QR.');
+                showToast('Browser tidak mendukung kamera, silakan pilih file QR.', 'danger');
                 return;
             }
 
-            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode = new Html5Qrcode('reader');
             const config = { fps: 20, qrbox: { width: 240, height: 240 } };
 
             html5QrCode.start(
-                { facingMode: "environment" },
+                { facingMode: 'environment' },
                 config,
                 onScanSuccess,
                 onScanFailure
             ).catch(err => {
                 console.log('Kamera error/izin ditolak: ', err);
-                alert('Akses kamera ditolak. Anda bisa memilih file QR dari galeri.');
+                showToast('Akses kamera ditolak. Anda bisa memilih file QR dari galeri.', 'info');
             });
         }
 
@@ -327,13 +440,13 @@
             let hp = document.getElementById('gen-hp').value.trim();
 
             if (!nama || !kelas || !hp) {
-                alert("Harap lengkapi semua data siswa terlebih dahulu, ZxD!");
+                alert('Harap lengkapi semua data siswa terlebih dahulu, ZxD!');
                 return;
             }
 
-            let combinedData = `${nama} | ${kelas} | ${hp}`;
-            let qrElement = document.getElementById('qrcode');
-            qrElement.innerHTML = "";
+            const combinedData = `${nama}|${kelas}|${hp}`;
+            const qrElement = document.getElementById('qrcode');
+            qrElement.innerHTML = '';
 
             qrInstance = new QRCode(qrElement, {
                 text: combinedData,
@@ -347,31 +460,23 @@
             document.getElementById('qrcode-container').classList.remove('hidden');
 
             setTimeout(() => {
-                let img = qrElement.querySelector('img') || qrElement.querySelector('canvas');
-                let downloadBtn = document.getElementById('download-btn');
+                const img = qrElement.querySelector('img') || qrElement.querySelector('canvas');
+                const downloadBtn = document.getElementById('download-btn');
 
                 if (img) {
-                    if (img.tagName === 'CANVAS') {
-                        downloadBtn.href = img.toDataURL('image/png');
-                    } else {
-                        downloadBtn.href = img.src;
-                    }
-                    downloadBtn.download = `QR-${nama.replace(/\s+/g, '_')}-${kelas}.png`;
+                    const fileName = `QR-${nama.replace(/\s+/g, '_')}-${kelas}.png`;
+                    downloadBtn.onclick = () => {
+                        const dataUrl = img.tagName === 'CANVAS' ? img.toDataURL('image/png') : img.src;
+                        const a = document.createElement('a');
+                        a.href = dataUrl;
+                        a.download = fileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        showToast('QR berhasil disimpan ke file.', 'success');
+                    };
                 }
             }, 400);
-        }
-
-        function bindFileUpload() {
-            const fileInput = document.getElementById('file-qrcode-input');
-            const fileButton = document.getElementById('btn-upload-qr');
-
-            fileButton.addEventListener('click', () => fileInput.click());
-            fileInput.addEventListener('change', (event) => {
-                const file = event.target.files && event.target.files[0];
-                if (file) {
-                    scanFileQRCode(file);
-                }
-            });
         }
 
         window.addEventListener('load', () => {
@@ -386,7 +491,7 @@
                 setTimeout(() => {
                     showPermissionModal();
                 }, 300);
-            }, 1500);
+            }, 1200);
         });
     </script>
 </body>
