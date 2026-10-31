@@ -11,7 +11,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -25,7 +25,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Sync Capacitor
+      - name: Add Android platform if missing
+        shell: bash
+        run: |
+          if [ ! -d "android" ]; then
+            npx cap add android
+          fi
+
+      - name: Sync Capacitor project
         run: npx cap sync android
 
       - name: Decode keystore
@@ -33,8 +40,8 @@ jobs:
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/release-keystore.jks
 
       - name: Build APK
+        working-directory: android
         run: |
-          cd android
           chmod +x ./gradlew
           ./gradlew assembleRelease \
             -Pandroid.injected.signing.store.file=$GITHUB_WORKSPACE/android/release-keystore.jks \
@@ -43,8 +50,8 @@ jobs:
             -Pandroid.injected.signing.key.password="${{ secrets.KEY_PASSWORD }}"
 
       - name: Build AAB
+        working-directory: android
         run: |
-          cd android
           ./gradlew bundleRelease \
             -Pandroid.injected.signing.store.file=$GITHUB_WORKSPACE/android/release-keystore.jks \
             -Pandroid.injected.signing.store.password="${{ secrets.KEYSTORE_PASSWORD }}" \
