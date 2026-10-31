@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absensi Digital - MTsN 6 Solok</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        #reader video {
+            width: 100% !important;
+            height: auto !important;
+            object-fit: cover;
+            border-radius: 0.75rem;
+        }
+
+        @keyframes rgb-spin {
+            0% { transform: rotate(0deg); filter: hue-rotate(0deg); }
+            50% { transform: rotate(180deg); filter: hue-rotate(180deg); }
+            100% { transform: rotate(360deg); filter: hue-rotate(360deg); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        .rgb-loader {
+            animation: rgb-spin 2s linear infinite, pulse-glow 1.5s ease-in-out infinite;
+            background: linear-gradient(135deg, #10b981, #3b82f6, #ec4899, #8b5cf6, #10b981);
+            background-size: 300% 300%;
+        }
+
+        #splash-screen {
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+
+    <!-- Splash Screen Loading RGB ZxD (3 Detik) -->
+    <div id="splash-screen" class="fixed inset-0 z-50 bg-slate-900 flex flex-col items-center justify-center text-white">
+        <div class="relative flex items-center justify-center mb-6">
+            <div class="absolute w-24 h-24 rounded-full rgb-loader opacity-80 blur-sm"></div>
+            <div class="relative w-20 h-20 bg-slate-900 rounded-2xl border-2 border-emerald-500/50 flex items-center justify-center shadow-2xl">
+                <span class="text-2xl font-black bg-gradient-to-r from-emerald-400 via-sky-400 to-pink-500 bg-clip-text text-transparent">ZxD</span>
+            </div>
+        </div>
+        <h2 class="text-lg font-bold tracking-wider text-slate-100 mb-1">MTsN 6 SOLOK</h2>
+        <p class="text-xs text-emerald-400 font-medium animate-pulse">Memuat Sistem Absensi...</p>
+    </div>
+
+    <!-- Header Modern -->
+    <header class="w-full bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+                <div class="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold shadow-md shadow-emerald-600/20">
+                    M6
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold text-slate-900 leading-tight">MTsN 6 Solok</h1>
+                    <p class="text-[11px] text-emerald-600 font-medium">Sistem Absensi & Kartu Siswa</p>
+                </div>
+            </div>
+            <span class="text-[10px] bg-emerald-50 text-emerald-700 font-semibold px-2.5 py-1 rounded-full border border-emerald-200/60">
+                v2.6 Live
+            </span>
+        </div>
+    </header>
+
+    <!-- Tab Navigasi -->
+    <div class="max-w-md w-full mx-auto px-4 mt-4">
+        <div class="bg-slate-200/70 p-1 rounded-xl flex shadow-inner">
+            <button onclick="switchTab('scanner')" id="tab-scanner-btn" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-white text-emerald-700 shadow-sm transition-all duration-200">
+                📷 Scan Absen
+            </button>
+            <button onclick="switchTab('generator')" id="tab-generator-btn" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all duration-200">
+                🪪 Buat QR Kartu
+            </button>
+        </div>
+    </div>
+
+    <!-- Konten Utama -->
+    <main class="max-w-md w-full mx-auto p-4 flex-1 flex flex-col justify-center">
+        
+        <!-- View Scanner -->
+        <div id="view-scanner" class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Kamera Scanner Guru</h2>
+                <button onclick="initScanner()" class="text-xs text-emerald-600 font-semibold hover:underline">
+                    Reset Kamera 🔄
+                </button>
+            </div>
+
+            <div id="reader" class="w-full rounded-xl overflow-hidden border border-slate-200 bg-slate-900 mb-3"></div>
+
+            <div id="result-container" class="hidden mt-3 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-center">
+                <span class="inline-block text-emerald-700 font-bold text-sm mb-1">✨ Absen Berhasil Tercatat!</span>
+                <p id="student-info" class="text-xs text-slate-600 mb-3 font-medium"></p>
+                <div class="inline-flex items-center text-xs text-emerald-600 font-semibold bg-white px-3 py-1.5 rounded-lg border border-emerald-200 shadow-sm">
+                    Membuka WhatsApp otomatis... 🚀
+                </div>
+            </div>
+
+            <button id="btn-rescan" onclick="location.reload()" class="hidden mt-3 w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2.5 px-4 rounded-xl shadow-md shadow-emerald-600/20 transition-all">
+                Scan Siswa Lain
+            </button>
+        </div>
+
+        <!-- View Generator -->
+        <div id="view-generator" class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm hidden">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Form Data Kartu Siswa</h2>
+            
+            <div class="space-y-3.5 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1.5">Nama Lengkap Siswa</label>
+                    <input type="text" id="gen-nama" placeholder="Contoh: Zidan Ramadan" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1.5">Kelas</label>
+                    <input type="text" id="gen-kelas" placeholder="Contoh: IX-A" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1.5">No. WhatsApp Orang Tua</label>
+                    <input type="text" id="gen-hp" placeholder="Contoh: 6281234567890" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all">
+                </div>
+                <button onclick="generateQRCode()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-md shadow-emerald-600/20 transition-all mt-1">
+                    Generate QR Code Kartu 📱
+                </button>
+            </div>
+
+            <div id="qrcode-container" class="mt-5 flex flex-col items-center hidden pt-4 border-t border-slate-100">
+                <div id="qrcode" class="p-3 bg-white rounded-2xl border border-slate-200 shadow-sm mb-3"></div>
+                <a id="download-btn" class="w-full text-center bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold py-2.5 px-4 rounded-xl shadow transition-all cursor-pointer">
+                    Download Gambar QR (.PNG) 📥
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer Copyright -->
+    <footer class="w-full py-4 text-center text-[11px] text-slate-400 border-t border-slate-200/60 mt-auto bg-white">
+        &copy; 2026 ZxD ~ MTsN 6 Solok, Sumatera Barat &bull; Secure Apps
+    </footer>
+
+    <!-- Skrip Logika -->
+    <script>
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                splash.style.opacity = '0';
+                splash.style.visibility = 'hidden';
+                setTimeout(initScanner, 300);
+            }, 3000);
+        });
+
+        function switchTab(tab) {
+            const scannerView = document.getElementById('view-scanner');
+            const generatorView = document.getElementById('view-generator');
+            const scannerBtn = document.getElementById('tab-scanner-btn');
+            const generatorBtn = document.getElementById('tab-generator-btn');
+
+            if (tab === 'scanner') {
+                scannerView.classList.remove('hidden');
+                generatorView.classList.add('hidden');
+                scannerBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-white text-emerald-700 shadow-sm transition-all duration-200";
+                generatorBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all duration-200";
+            } else {
+                scannerView.classList.add('hidden');
+                generatorView.classList.remove('hidden');
+                generatorBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-white text-emerald-700 shadow-sm transition-all duration-200";
+                scannerBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all duration-200";
+            }
+        }
+
+        let qrInstance = null;
+        function generateQRCode() {
+            let nama = document.getElementById('gen-nama').value.trim();
+            let kelas = document.getElementById('gen-kelas').value.trim();
+            let hp = document.getElementById('gen-hp').value.trim();
+
+            if (!nama || !kelas || !hp) {
+                alert("Harap lengkapi semua data siswa terlebih dahulu, ZxD!");
+                return;
+            }
+
+            let combinedData = `${nama} | ${kelas} | ${hp}`;
+            let qrElement = document.getElementById('qrcode');
+            qrElement.innerHTML = "";
+
+            qrInstance = new QRCode(qrElement, {
+                text: combinedData,
+                width: 200,
+                height: 200,
+                colorDark : "#0f172a",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+
+            document.getElementById('qrcode-container').classList.remove('hidden');
+
+            setTimeout(() => {
+                let img = qrElement.querySelector('img') || qrElement.querySelector('canvas');
+                let downloadBtn = document.getElementById('download-btn');
+                
+                if (img) {
+                    if (img.tagName === 'CANVAS') {
+                        downloadBtn.href = img.toDataURL("image/png");
+                    } else {
+                        downloadBtn.href = img.src;
+                    }
+                    downloadBtn.download = `QR-${nama.replace(/\s+/g, '_')}-${kelas}.png`;
+                }
+            }, 400);
+        }
+
+        let html5QrCode = null;
+        let isScanned = false;
+
+        function initScanner() {
+            if (html5QrCode) {
+                try { html5QrCode.stop(); } catch(e) {}
+            }
+
+            html5QrCode = new Html5Qrcode("reader");
+            const config = { fps: 20, qrbox: { width: 240, height: 240 } };
+            
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                config, 
+                onScanSuccess, 
+                onScanFailure
+            ).catch(err => {
+                console.log("Kamera error/izin ditolak: ", err);
+            });
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            if (isScanned) return;
+            isScanned = true;
+
+            if (html5QrCode) {
+                html5QrCode.stop().catch(err => console.log(err));
+            }
+
+            let dataParts = decodedText.split("|");
+            let nama = dataParts[0] ? dataParts[0].trim() : "Siswa";
+            let kelas = dataParts[1] ? dataParts[1].trim() : "-";
+            let noOrtu = dataParts[2] ? dataParts[2].trim() : "";
+
+            document.getElementById("student-info").innerHTML = `
+                <strong>${nama}</strong> <br> Kelas: ${kelas}
+            `;
+            
+            let pesanWA = `${nama} hadir!`;
+            let encodedPesan = encodeURIComponent(pesanWA);
+            let waUrl = `https://api.whatsapp.com/send?phone=${noOrtu}&text=${encodedPesan}`;
+
+            document.getElementById("result-container").classList.remove("hidden");
+            document.getElementById("btn-rescan").classList.remove("hidden");
+
+            setTimeout(() => {
+                window.location.href = waUrl;
+            }, 1000);
+        }
+
+        function onScanFailure(error) {}
+    </script>
+</body>
+</html>
