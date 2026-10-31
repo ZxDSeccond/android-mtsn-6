@@ -6,6 +6,9 @@
   "scripts": {
     "start": "npx serve www",
     "build": "npx cap sync android",
+    "android:sync": "npx cap sync android",
+    "android:open": "npx cap open android",
+    "android:add": "npx cap add android",
     "test": "echo \"Error: no test specified\" && exit 0"
   },
   "dependencies": {

@@ -1,8 +1,9 @@
-name: Build Android APK Pure Gradle
+name: Build Android APK (Capacitor)
 
 on:
   push:
     branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -13,10 +14,10 @@ jobs:
       ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -24,15 +25,16 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Set up JDK 17
+      - name: Setup JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Setup Android SDK manually
+      - name: Setup Android SDK
         shell: bash
         run: |
+          set -e
           mkdir -p "$ANDROID_HOME"
           cd "$RUNNER_TEMP"
 
@@ -42,35 +44,36 @@ jobs:
           unzip -q commandlinetools.zip -d "$ANDROID_HOME"
 
           if [ -d "$ANDROID_HOME/cmdline-tools/bin" ]; then
-            echo "cmdline-tools already ready"
+            echo "cmdline-tools exists"
           else
             if [ -d "$ANDROID_HOME/cmdline-tools-latest/bin" ]; then
               mkdir -p "$ANDROID_HOME/cmdline-tools"
               mv "$ANDROID_HOME/cmdline-tools-latest" "$ANDROID_HOME/cmdline-tools/latest"
             else
               echo "SDK structure not found"
-              find "$ANDROID_HOME" -maxdepth 4 -type d | head -50
+              find "$ANDROID_HOME" -maxdepth 5 -type d | head -50
               exit 1
             fi
           fi
 
           printf 'y\n%.0s' {1..100} | "$ANDROID_HOME/cmdline-tools/bin/sdkmanager" --sdk_root="$ANDROID_HOME" --licenses
+
           "$ANDROID_HOME/cmdline-tools/bin/sdkmanager" --sdk_root="$ANDROID_HOME" --install \
             "platform-tools" \
-            "platforms;android-33" \
-            "build-tools;30.0.3"
+            "platforms;android-34" \
+            "build-tools;34.0.0"
 
-      - name: Create Android project if missing
+      - name: Generate Android project if missing
         run: |
           if [ ! -d "android" ]; then
             npx cap add android
           fi
 
-      - name: Sync web assets to Android
+      - name: Sync web assets to native Android app
         run: |
           npx cap sync android
 
-      - name: Build APK
+      - name: Build debug APK
         run: |
           cd android
           chmod +x gradlew
@@ -79,5 +82,13 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: apk-debug-mtsn6
+          name: mtsn6-absen-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Upload APK directory info
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mtsn6-absen-build-logs
+          path: android/app/build/outputs/apk/
+          if-no-files-found: ignore
