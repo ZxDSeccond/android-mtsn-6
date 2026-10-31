@@ -28,7 +28,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: '17'
 
       - name: Setup Android SDK manually
         shell: bash
@@ -42,7 +42,7 @@ jobs:
           unzip -q commandlinetools.zip -d "$ANDROID_HOME"
 
           if [ -d "$ANDROID_HOME/cmdline-tools/bin" ]; then
-            echo "cmdline-tools ready"
+            echo "cmdline-tools already ready"
           else
             if [ -d "$ANDROID_HOME/cmdline-tools-latest/bin" ]; then
               mkdir -p "$ANDROID_HOME/cmdline-tools"
