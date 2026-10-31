@@ -54,7 +54,7 @@ jobs:
             fi
           fi
 
-          yes | "$ANDROID_HOME/cmdline-tools/bin/sdkmanager" --sdk_root="$ANDROID_HOME" --licenses
+          printf 'y\n%.0s' {1..100} | "$ANDROID_HOME/cmdline-tools/bin/sdkmanager" --sdk_root="$ANDROID_HOME" --licenses
           "$ANDROID_HOME/cmdline-tools/bin/sdkmanager" --sdk_root="$ANDROID_HOME" --install \
             "platform-tools" \
             "platforms;android-33" \
