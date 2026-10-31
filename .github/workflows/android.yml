@@ -23,8 +23,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: |
-          npm install
+        run: npm install
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -44,6 +43,7 @@ jobs:
           unzip -q commandlinetools.zip -d "$ANDROID_HOME"
 
           mkdir -p "$ANDROID_HOME/cmdline-tools"
+
           if [ ! -d "$ANDROID_HOME/cmdline-tools/latest" ]; then
             if [ -d "$ANDROID_HOME/cmdline-tools-latest" ]; then
               mv "$ANDROID_HOME/cmdline-tools-latest" "$ANDROID_HOME/cmdline-tools/latest"
