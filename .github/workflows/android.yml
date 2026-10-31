@@ -1,4 +1,4 @@
-lname: Build Android Release APK/AAB
+name: Build Android Release APK/AAB
 
 on:
   workflow_dispatch:
