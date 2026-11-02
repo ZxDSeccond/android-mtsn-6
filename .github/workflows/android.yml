@@ -58,7 +58,10 @@ jobs:
             exit 1
           fi
 
-          yes | "$SDKMANAGER" --licenses
+          echo "Using SDK manager: $SDKMANAGER"
+
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+
           "$SDKMANAGER" --sdk_root="$ANDROID_HOME" --install \
             "platform-tools" \
             "platforms;android-33" \
