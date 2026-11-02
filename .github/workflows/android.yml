@@ -43,7 +43,6 @@ jobs:
           ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
         run: |
           set -euxo pipefail
-
           mkdir -p "$ANDROID_HOME/cmdline-tools"
           cd "$HOME"
 
@@ -66,23 +65,9 @@ jobs:
             "platforms;android-33" \
             "build-tools;33.0.0"
 
-      - name: Generate fallback debug keystore for installable APK
+      - name: Generate release keystore if GitHub secret exists
         shell: bash
         run: |
-          mkdir -p "$HOME/.android"
-          if [ ! -f "$HOME/.android/debug.keystore" ]; then
-            keytool -genkeypair \
-              -v \
-              -keystore "$HOME/.android/debug.keystore" \
-              -alias androiddebugkey \
-              -keyalg RSA \
-              -keysize 2048 \
-              -validity 10000 \
-              -storepass android \
-              -keypass android \
-              -dname "CN=Android Debug, O=Android, C=US"
-          fi
-
           if [ -n "$KEYSTORE_BASE64" ]; then
             mkdir -p "$RUNNER_TEMP/keystore"
             echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/keystore/release.keystore"
@@ -109,6 +94,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
-          path: |
-            android/app/build/outputs/apk/release/*.apk
-            android/app/build/outputs/mapping/release/mapping.txt
+          path: android/app/build/outputs/apk/release/*.apk
