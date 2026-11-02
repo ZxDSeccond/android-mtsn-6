@@ -351,7 +351,11 @@
         });
 
         document.getElementById('qrcode-container').classList.remove('hidden');
-        alert('Data siswa berhasil tersimpan di Supabase.');
+        setTimeout(() => {
+          downloadQRCode({ auto: true });
+        }, 300);
+
+        alert('QR berhasil dibuat dan otomatis tersimpan. Buka tab Scanner bila siap untuk pindai.');
       } catch (error) {
         console.error(error);
         alert('Gagal menyimpan data siswa.');
@@ -361,12 +365,13 @@
       }
     }
 
-    function downloadQRCode() {
+    function downloadQRCode(options = {}) {
+      const { auto = false } = options;
       const qrEl = document.getElementById('qrcode');
       const img = qrEl.querySelector('img') || qrEl.querySelector('canvas');
 
       if (!img) {
-        alert('QR Code belum tersedia.');
+        if (!auto) alert('QR Code belum tersedia.');
         return;
       }
 
