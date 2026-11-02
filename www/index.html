@@ -11,17 +11,18 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <style>
-    :root{
-      --bg:#020817;
-      --panel:#0f172a;
-      --panel-soft:#111827;
-      --line:#334155;
-      --text:#e2e8f0;
-      --muted:#94a3b8;
-      --green:#10b981;
-      --green-2:#34d399;
-      --cyan:#22d3ee;
-      --shadow: rgba(15, 23, 42, .7);
+    :root {
+      --bg: #020817;
+      --panel: #0f172a;
+      --panel-soft: #111827;
+      --line: #334155;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --green: #10b981;
+      --green-2: #34d399;
+      --cyan: #22d3ee;
+      --danger: #ef4444;
+      --shadow: rgba(15, 23, 42, 0.7);
     }
 
     * { box-sizing: border-box; }
@@ -155,9 +156,7 @@
       box-shadow: 0 12px 28px rgba(2,6,23,0.3);
     }
 
-    .hidden {
-      display: none !important;
-    }
+    .hidden { display: none !important; }
 
     .label {
       display: block;
@@ -180,9 +179,7 @@
       outline: none;
     }
 
-    .input::placeholder {
-      color: #64748b;
-    }
+    .input::placeholder { color: #64748b; }
 
     .input:focus {
       border-color: rgba(52, 211, 153, 0.8);
@@ -306,9 +303,7 @@
       text-align: center;
     }
 
-    .result-box.show {
-      display: block;
-    }
+    .result-box.show { display: block; }
 
     .result-title {
       color: #a7f3d0;
@@ -355,11 +350,24 @@
       text-transform: uppercase;
       font-size: 9px;
     }
+
+    .error-box {
+      margin-top: 14px;
+      display: none;
+      border: 1px solid rgba(239,68,68,.45);
+      background: rgba(239,68,68,.08);
+      color: #fecaca;
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .error-box.show { display: block; }
   </style>
 </head>
 <body>
   <div class="app">
-
     <header class="header">
       <div class="header-inner">
         <div class="brand">
@@ -392,10 +400,7 @@
           </div>
         </div>
 
-        <button type="button" class="btn btn-primary" id="btn-start-camera">
-          Buka Kamera QR
-        </button>
-
+        <button type="button" class="btn btn-primary" id="btn-start-camera">Buka Kamera QR</button>
         <div id="reader" class="scan-box hidden" aria-live="polite"></div>
 
         <div id="loading-scan" class="loading-box">
@@ -409,6 +414,8 @@
           <div class="result-title">Berhasil Tercatat</div>
           <div id="student-info" class="result-text"></div>
         </div>
+
+        <div id="error-box" class="error-box"></div>
 
         <button type="button" class="btn btn-secondary hidden" id="btn-rescan" style="margin-top:16px;">
           Scan Lagi
@@ -441,16 +448,14 @@
             <input id="gen-hp" class="input" type="text" placeholder="Contoh: 6281234567890" />
           </div>
 
-          <button type="button" class="btn btn-primary" id="btn-save">
-            Simpan & Buat QR
-          </button>
+          <button type="button" class="btn btn-primary" id="btn-save">Simpan & Buat QR</button>
         </div>
+
+        <div id="error-box-form" class="error-box"></div>
 
         <div id="qrcode-wrap" class="qr-wrap hidden">
           <div id="qrcode"></div>
-          <button type="button" class="btn btn-secondary" id="btn-download-qr">
-            Download QR
-          </button>
+          <button type="button" class="btn btn-secondary" id="btn-download-qr">Download QR</button>
         </div>
       </section>
     </main>
@@ -472,6 +477,20 @@
         "Content-Type": "application/json",
         "Prefer": "return=representation"
       };
+    }
+
+    function showError(message, targetId = "error-box") {
+      const node = document.getElementById(targetId);
+      if (!node) return;
+      node.textContent = message;
+      node.classList.add("show");
+    }
+
+    function clearError(targetId = "error-box") {
+      const node = document.getElementById(targetId);
+      if (!node) return;
+      node.textContent = "";
+      node.classList.remove("show");
     }
 
     function setActiveTab(tabName) {
@@ -521,6 +540,7 @@
     }
 
     function startCameraFromUserAction() {
+      clearError();
       hideScanResult();
 
       const reader = document.getElementById("reader");
@@ -580,12 +600,12 @@
       if (!studentId) return;
 
       stopScanner();
-
       showLoading(true);
+      clearError();
 
       try {
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/students?id=eq.${encodeURIComponent(studentId)}`,
+          `${SUPABASE_URL}/rest/v1/students?id=eq.${encodeURIComponent(studentId)}&select=*`,
           {
             method: "GET",
             headers: getSupabaseHeaders()
@@ -593,6 +613,10 @@
         );
 
         const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error((Array.isArray(data) && data[0] && data[0].message) ? data[0].message : "Query siswa gagal.");
+        }
 
         if (!Array.isArray(data) || data.length === 0) {
           showLoading(false);
@@ -616,7 +640,7 @@
         const btnRescan = document.getElementById("btn-rescan");
         if (btnRescan) btnRescan.classList.remove("hidden");
 
-        await fetch(`${SUPABASE_URL}/rest/v1/attendance`, {
+        const attendanceResponse = await fetch(`${SUPABASE_URL}/rest/v1/attendance?select=*`, {
           method: "POST",
           headers: getSupabaseHeaders(),
           body: JSON.stringify({
@@ -625,6 +649,11 @@
             scanned_at: new Date().toISOString()
           })
         });
+
+        if (!attendanceResponse.ok) {
+          const attendanceText = await attendanceResponse.text();
+          console.error("Attendance insert failed:", attendanceText);
+        }
 
         const message = `Assalamu'alaikum, memberitahukan bahwa ananda ${student.name} (${student.class}) telah hadir di MTsN 6 Solok hari ini. Terima kasih.`;
         const waUrl = `https://api.whatsapp.com/send?phone=${student.phone}&text=${encodeURIComponent(message)}`;
@@ -635,13 +664,16 @@
 
       } catch (error) {
         console.error(error);
-        alert("Gagal memuat data dari server.");
+        showError(`Gagal memproses data siswa. ${error.message || "Silakan cek koneksi dan policy Supabase."}`);
+        alert(`Gagal memproses data siswa. ${error.message || "Silakan cek koneksi dan policy Supabase."}`);
       } finally {
         showLoading(false);
       }
     }
 
     async function registerAndGenerate() {
+      clearError("error-box-form");
+
       const idSiswa = document.getElementById("gen-id").value.trim();
       const nama = document.getElementById("gen-nama").value.trim();
       const kelas = document.getElementById("gen-kelas").value.trim();
@@ -664,16 +696,24 @@
       };
 
       try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/students`, {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/students?select=*`, {
           method: "POST",
           headers: getSupabaseHeaders(),
           body: JSON.stringify(payload)
         });
 
+        const text = await response.text();
+        let data = null;
+
+        try {
+          data = text ? JSON.parse(text) : null;
+        } catch (e) {
+          data = null;
+        }
+
         if (!response.ok) {
-          const text = await response.text();
-          console.error(text);
-          throw new Error("insert failed");
+          const details = data && data[0] && data[0].message ? data[0].message : text;
+          throw new Error(details || "Insert ke database gagal.");
         }
 
         generatedStudentId = idSiswa;
@@ -698,7 +738,9 @@
         alert("QR berhasil dibuat dan otomatis tersimpan. Silakan buka tab Scanner untuk memindai.");
       } catch (error) {
         console.error(error);
-        alert("Gagal menyimpan data siswa.");
+        const message = error && error.message ? error.message : "Gagal menyimpan data siswa.";
+        showError(`Gagal menyimpan data siswa. ${message}. Pastikan policy insert tabel students di Supabase sudah diizinkan untuk anon/public.`, "error-box-form");
+        alert(`Gagal menyimpan data siswa. ${message}`);
       } finally {
         btnSave.disabled = false;
         btnSave.textContent = "Simpan & Buat QR";
