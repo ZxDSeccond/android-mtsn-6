@@ -5,130 +5,465 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0f172a" />
   <title>Absensi MTsN 6 Solok</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/dist/html5-qrcode.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    #reader video { width: 100% !important; height: auto !important; object-fit: cover; border-radius: 1rem; }
-    .scan-shell { min-height: 220px; }
-    .bg-mesh {
-      background:
-        radial-gradient(circle at top, rgba(16,185,129,0.2), transparent 35%),
-        radial-gradient(circle at bottom right, rgba(59,130,246,0.18), transparent 35%),
-        #020817;
+    :root{
+      --bg:#020817;
+      --panel:#0f172a;
+      --panel-soft:#111827;
+      --line:#334155;
+      --text:#e2e8f0;
+      --muted:#94a3b8;
+      --green:#10b981;
+      --green-2:#34d399;
+      --cyan:#22d3ee;
+      --shadow: rgba(15, 23, 42, .7);
     }
-    .glass {
-      background: rgba(15, 23, 42, 0.72);
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100%;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at top, rgba(16,185,129,0.15), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(34,211,238,0.12), transparent 35%),
+        var(--bg);
+    }
+
+    .app {
+      max-width: 440px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 16px 14px 28px;
+    }
+
+    .header {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 22px;
+      padding: 12px 14px;
+      box-shadow: 0 12px 28px rgba(2,6,23,0.35);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
     }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      color: #052e16;
+      background: linear-gradient(135deg, #34d399, #22d3ee);
+      box-shadow: 0 8px 20px rgba(52, 211, 153, 0.35);
+    }
+
+    .title {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin: 0;
+    }
+
+    .subtitle {
+      margin: 2px 0 0 0;
+      color: #34d399;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+    }
+
+    .status {
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      background: rgba(16, 185, 129, 0.08);
+      color: #a7f3d0;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 6px 8px;
+      border-radius: 999px;
+    }
+
+    .tabs {
+      margin-top: 16px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 18px;
+      padding: 6px;
+    }
+
+    .tabs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .tab-btn {
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: #cbd5e1;
+      padding: 12px 8px;
+      border-radius: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 11px;
+      transition: 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      color: white;
+      box-shadow: 0 10px 22px rgba(16, 185, 129, 0.25);
+    }
+
+    .panel {
+      margin-top: 16px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: 0 12px 28px rgba(2,6,23,0.3);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .label {
+      display: block;
+      margin-bottom: 8px;
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .input {
+      width: 100%;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(15, 23, 42, 0.7);
+      color: #f8fafc;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .input::placeholder {
+      color: #64748b;
+    }
+
+    .input:focus {
+      border-color: rgba(52, 211, 153, 0.8);
+      box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.15);
+    }
+
+    .space-y > * + * { margin-top: 14px; }
+
+    .btn {
+      width: 100%;
+      border: 0;
+      border-radius: 16px;
+      padding: 14px 16px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-size: 11px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      color: white;
+      box-shadow: 0 12px 22px rgba(16,185,129,0.25);
+    }
+
+    .btn-secondary {
+      background: rgba(51,65,85,0.85);
+      color: white;
+    }
+
+    .scan-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .mini-btn {
+      border: 0;
+      background: rgba(71,85,105,0.8);
+      color: #f8fafc;
+      border-radius: 12px;
+      padding: 9px 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 10px;
+      cursor: pointer;
+    }
+
+    .scan-box {
+      width: 100%;
+      min-height: 220px;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #020817;
+      border: 1px solid rgba(148,163,184,0.25);
+      position: relative;
+    }
+
+    #reader video {
+      width: 100% !important;
+      height: auto !important;
+      border-radius: 18px;
+      display: block;
+      object-fit: cover;
+      max-height: 420px;
+    }
+
+    .loading-box {
+      display: none;
+      text-align: center;
+      padding: 20px 8px 8px;
+    }
+
+    .loading-box.show {
+      display: block;
+    }
+
+    .spinner-core {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #34d399, #22d3ee);
+      margin: 0 auto 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulse 1.1s infinite ease-in-out;
+    }
+
+    .spinner-core::before {
+      content: "";
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #020817;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.08); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.8; }
+    }
+
+    .result-box {
+      display: none;
+      margin-top: 16px;
+      border-radius: 16px;
+      background: rgba(16,185,129,.09);
+      border: 1px solid rgba(52,211,153,.35);
+      padding: 16px;
+      text-align: center;
+    }
+
+    .result-box.show {
+      display: block;
+    }
+
+    .result-title {
+      color: #a7f3d0;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 11px;
+    }
+
+    .result-text {
+      margin-top: 10px;
+      color: #e2e8f0;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .qr-wrap {
+      margin-top: 18px;
+      border: 1px solid rgba(148,163,184,0.25);
+      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 16px;
+      text-align: center;
+    }
+
+    #qrcode {
+      width: 200px;
+      height: 200px;
+      margin: 0 auto 14px;
+      background: #fff;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+    }
+
+    .footer {
+      margin-top: 22px;
+      text-align: center;
+      color: #64748b;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-size: 9px;
+    }
   </style>
 </head>
-<body class="bg-mesh text-slate-100 min-h-screen">
-  <div class="mx-auto max-w-md min-h-screen px-4 pb-8 pt-4">
-    <header class="glass sticky top-3 z-40 rounded-2xl border border-slate-700/60 shadow-xl shadow-slate-950/40">
-      <div class="flex items-center justify-between px-4 py-3">
-        <div class="flex items-center gap-3">
-          <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 via-teal-400 to-cyan-500 text-lg font-black text-slate-950 shadow-lg shadow-emerald-500/30">M6</div>
+<body>
+  <div class="app">
+
+    <header class="header">
+      <div class="header-inner">
+        <div class="brand">
+          <div class="logo">M</div>
           <div>
-            <h1 class="text-[11px] font-bold uppercase tracking-[0.12em] text-white">MTsN 6 Solok</h1>
-            <p class="text-[10px] text-emerald-400">Sistem Absensi Digital</p>
+            <p class="title">MTsN 6 Solok</p>
+            <p class="subtitle">Sistem Absensi Digital</p>
           </div>
         </div>
-        <span class="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-emerald-300">Online</span>
+        <span class="status">Online</span>
       </div>
     </header>
 
-    <nav class="mt-4 rounded-2xl border border-slate-700/60 bg-slate-900/80 p-1.5 shadow-lg shadow-slate-950/30">
-      <div class="grid grid-cols-2 gap-1">
-        <button id="tab-scanner-btn" class="tab-button active" type="button" onclick="switchTab('scanner')">Scanner</button>
-        <button id="tab-generator-btn" class="tab-button" type="button" onclick="switchTab('generator')">Daftar Siswa</button>
+    <nav class="tabs">
+      <div class="tabs-grid">
+        <button class="tab-btn active" type="button" data-tab="scanner">Scanner</button>
+        <button class="tab-btn" type="button" data-tab="generator">Daftar Siswa</button>
       </div>
     </nav>
 
-    <main class="mt-4 space-y-4">
+    <main>
       <section id="view-scanner" class="panel">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h2 class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Pindai Kehadiran</h2>
+        <div class="scan-header">
+          <div style="color:#94a3b8;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;">
+            Pindai Kehadiran
           </div>
-          <div class="flex items-center gap-2">
-            <button onclick="document.getElementById('file-input').click()" class="mini-button" type="button">Galeri</button>
-            <input type="file" id="file-input" accept="image/*" class="hidden" onchange="scanFromGallery(event)" />
+          <div>
+            <button type="button" class="mini-btn" id="btn-gallery">Galeri</button>
+            <input type="file" id="file-input" accept="image/*" class="hidden" />
           </div>
         </div>
 
-        <button id="btn-start-camera" type="button" class="w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-white shadow-lg shadow-emerald-500/20 transition hover:brightness-110">
+        <button type="button" class="btn btn-primary" id="btn-start-camera">
           Buka Kamera QR
         </button>
 
-        <div id="reader" class="scan-shell mt-4 hidden overflow-hidden rounded-2xl border border-slate-700 bg-slate-950"></div>
+        <div id="reader" class="scan-box hidden" aria-live="polite"></div>
 
-        <div id="loading-scan" class="hidden py-5 text-center">
-          <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-emerald-400 via-cyan-400 to-violet-500 p-[2px] shadow-lg shadow-emerald-500/20">
-            <div class="h-full w-full rounded-full bg-slate-950"></div>
+        <div id="loading-scan" class="loading-box">
+          <div class="spinner-core"></div>
+          <div style="color:#34d399;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;">
+            Menyinkronkan data
           </div>
-          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-400 animate-pulse">Menyinkronkan data</p>
         </div>
 
-        <div id="result-container" class="hidden mt-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-center">
-          <div class="text-sm font-bold text-emerald-300">Berhasil Tercatat</div>
-          <p id="student-info" class="mt-2 text-xs leading-relaxed text-slate-200"></p>
-          <div class="mt-3 inline-flex rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-300">Mengirim notifikasi</div>
+        <div id="result-box" class="result-box">
+          <div class="result-title">Berhasil Tercatat</div>
+          <div id="student-info" class="result-text"></div>
         </div>
 
-        <button id="btn-rescan" onclick="startCameraFromUserAction()" type="button" class="hidden mt-4 w-full rounded-xl bg-emerald-500 px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400">Pindai Lagi</button>
+        <button type="button" class="btn btn-secondary hidden" id="btn-rescan" style="margin-top:16px;">
+          Scan Lagi
+        </button>
       </section>
 
       <section id="view-generator" class="panel hidden">
-        <div class="mb-4">
-          <h2 class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Registrasi Siswa</h2>
+        <div style="color:#94a3b8;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:12px;">
+          Registrasi Siswa
         </div>
 
-        <div class="space-y-3.5">
-          <label class="block">
-            <span class="mb-1.5 block text-[11px] font-semibold text-slate-300">ID / NISN</span>
-            <input id="gen-id" type="text" placeholder="Contoh: M6-001" class="input-field" />
-          </label>
+        <div class="space-y">
+          <div>
+            <label class="label">ID / NISN</label>
+            <input id="gen-id" class="input" type="text" placeholder="Contoh: M6-001" />
+          </div>
 
-          <label class="block">
-            <span class="mb-1.5 block text-[11px] font-semibold text-slate-300">Nama Lengkap</span>
-            <input id="gen-nama" type="text" placeholder="Contoh: Zidan Ramadan" class="input-field" />
-          </label>
+          <div>
+            <label class="label">Nama Lengkap</label>
+            <input id="gen-nama" class="input" type="text" placeholder="Contoh: Zidan Ramadan" />
+          </div>
 
-          <label class="block">
-            <span class="mb-1.5 block text-[11px] font-semibold text-slate-300">Kelas</span>
-            <input id="gen-kelas" type="text" placeholder="Contoh: IX-A" class="input-field" />
-          </label>
+          <div>
+            <label class="label">Kelas</label>
+            <input id="gen-kelas" class="input" type="text" placeholder="Contoh: IX-A" />
+          </div>
 
-          <label class="block">
-            <span class="mb-1.5 block text-[11px] font-semibold text-slate-300">No. WhatsApp Orang Tua</span>
-            <input id="gen-hp" type="text" placeholder="Contoh: 6281234567890" class="input-field" />
-          </label>
+          <div>
+            <label class="label">No. WhatsApp Orang Tua</label>
+            <input id="gen-hp" class="input" type="text" placeholder="Contoh: 6281234567890" />
+          </div>
 
-          <button id="btn-save" onclick="registerAndGenerate()" type="button" class="w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-white shadow-lg shadow-emerald-500/20 transition hover:brightness-110">Simpan & Buat QR</button>
+          <button type="button" class="btn btn-primary" id="btn-save">
+            Simpan & Buat QR
+          </button>
         </div>
 
-        <div id="qrcode-container" class="mt-5 hidden rounded-2xl border border-slate-700 bg-slate-950/60 p-4 text-center">
-          <div id="qrcode" class="mx-auto mb-3 flex w-[200px] items-center justify-center rounded-2xl bg-white p-3 shadow-xl"></div>
-          <button onclick="downloadQRCode()" type="button" class="w-full rounded-xl bg-slate-800 px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-slate-100 transition hover:bg-slate-700">Unduh QR</button>
+        <div id="qrcode-wrap" class="qr-wrap hidden">
+          <div id="qrcode"></div>
+          <button type="button" class="btn btn-secondary" id="btn-download-qr">
+            Download QR
+          </button>
         </div>
       </section>
     </main>
 
-    <footer class="mt-6 pb-2 text-center text-[10px] uppercase tracking-[0.12em] text-slate-500">
-      © 2026 ZxD • MTsN 6 Solok
-    </footer>
+    <div class="footer">© 2026 ZxD • MTsN 6 Solok</div>
   </div>
 
   <script>
     const SUPABASE_URL = "https://pkbgvpmkjadclogjmyxk.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_o9l7GgAJK_UvVReROKT3Vg_6DGOf7D8";
+
+    let html5QrCode = null;
+    let generatedStudentId = "";
 
     function getSupabaseHeaders() {
       return {
@@ -139,53 +474,63 @@
       };
     }
 
-    let html5QrCode = null;
-    let generatedStudentId = '';
+    function setActiveTab(tabName) {
+      const scannerSection = document.getElementById("view-scanner");
+      const generatorSection = document.getElementById("view-generator");
+      const buttons = document.querySelectorAll(".tab-btn");
 
-    function switchTab(tab) {
-      const scannerView = document.getElementById('view-scanner');
-      const generatorView = document.getElementById('view-generator');
-      const scannerBtn = document.getElementById('tab-scanner-btn');
-      const generatorBtn = document.getElementById('tab-generator-btn');
+      buttons.forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.tab === tabName);
+      });
 
-      if (tab === 'scanner') {
-        scannerView.classList.remove('hidden');
-        generatorView.classList.add('hidden');
-        scannerBtn.classList.add('active');
-        generatorBtn.classList.remove('active');
+      if (tabName === "scanner") {
+        scannerSection.classList.remove("hidden");
+        generatorSection.classList.add("hidden");
+        stopScanner();
       } else {
-        scannerView.classList.add('hidden');
-        generatorView.classList.remove('hidden');
-        generatorBtn.classList.add('active');
-        scannerBtn.classList.remove('active');
+        scannerSection.classList.add("hidden");
+        generatorSection.classList.remove("hidden");
         stopScanner();
       }
     }
 
     function stopScanner() {
-      if (html5QrCode) {
-        html5QrCode.stop().then(() => {
-          html5QrCode.clear();
+      if (!html5QrCode) return;
+
+      html5QrCode.stop()
+        .then(() => {
+          try { html5QrCode.clear(); } catch (e) {}
+        })
+        .catch(() => {})
+        .finally(() => {
           html5QrCode = null;
-        }).catch(() => {});
-      }
-      const reader = document.getElementById('reader');
-      if (reader) reader.classList.add('hidden');
+          const reader = document.getElementById("reader");
+          if (reader) reader.classList.add("hidden");
+        });
+    }
+
+    function showLoading(show) {
+      const loading = document.getElementById("loading-scan");
+      if (!loading) return;
+      loading.classList.toggle("show", show);
+    }
+
+    function hideScanResult() {
+      const resultBox = document.getElementById("result-box");
+      if (resultBox) resultBox.classList.remove("show");
     }
 
     function startCameraFromUserAction() {
-      const reader = document.getElementById('reader');
-      const loading = document.getElementById('loading-scan');
-      const result = document.getElementById('result-container');
-      const btnRescan = document.getElementById('btn-rescan');
+      hideScanResult();
 
-      if (reader) reader.classList.remove('hidden');
-      if (result) result.classList.add('hidden');
-      if (btnRescan) btnRescan.classList.add('hidden');
-      if (loading) loading.classList.add('hidden');
+      const reader = document.getElementById("reader");
+      const btnRescan = document.getElementById("btn-rescan");
+
+      if (reader) reader.classList.remove("hidden");
+      if (btnRescan) btnRescan.classList.add("hidden");
 
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert('Browser HP ini tidak mendukung akses kamera.');
+        alert("Browser ini tidak mendukung akses kamera.");
         return;
       }
 
@@ -199,92 +544,84 @@
       startCameraInstance();
     }
 
-    document.getElementById('btn-start-camera').addEventListener('click', startCameraFromUserAction);
-
     function startCameraInstance() {
-      html5QrCode = new Html5Qrcode('reader');
-      const config = { fps: 15, qrbox: { width: 220, height: 220 } };
+      const reader = document.getElementById("reader");
+      if (!reader) return;
+
+      try {
+        html5QrCode = new Html5Qrcode("reader");
+      } catch (error) {
+        alert("Camera tidak dapat diinisialisasi.");
+        return;
+      }
+
+      const config = { fps: 10, qrbox: { width: 260, height: 260 } };
 
       html5QrCode.start(
-        { facingMode: 'environment' },
+        { facingMode: "environment" },
         config,
         onScanSuccess,
         () => {}
       ).catch(() => {
         html5QrCode.start(
-          { facingMode: 'user' },
+          { facingMode: "user" },
           config,
           onScanSuccess,
           () => {}
         ).catch(() => {
-          alert('Kamera tidak bisa dibuka. Pastikan izin kamera sudah diizinkan dan coba lagi.');
-          const reader = document.getElementById('reader');
-          if (reader) reader.classList.add('hidden');
+          alert("Kamera tidak bisa dibuka. Pastikan izin kamera sudah diberikan.");
+          if (reader) reader.classList.add("hidden");
         });
       });
     }
 
-    function scanFromGallery(event) {
-      if (event.target.files.length === 0) return;
-      const imageFile = event.target.files[0];
-      const readerObj = new Html5Qrcode('reader');
-
-      readerObj.scanFile(imageFile, true)
-        .then(decodedText => {
-          readerObj.clear();
-          onScanSuccess(decodedText);
-        })
-        .catch(() => {
-          alert('QR Code tidak ditemukan di gambar yang dipilih.');
-        });
-    }
-
     async function onScanSuccess(decodedText) {
+      const studentId = String(decodedText).trim();
+      if (!studentId) return;
+
       stopScanner();
-      const studentId = decodedText.trim();
-      const loading = document.getElementById('loading-scan');
-      if (loading) loading.classList.remove('hidden');
+
+      showLoading(true);
 
       try {
-        const response = await fetch(
+        const res = await fetch(
           `${SUPABASE_URL}/rest/v1/students?id=eq.${encodeURIComponent(studentId)}`,
           {
-            method: 'GET',
+            method: "GET",
             headers: getSupabaseHeaders()
           }
         );
 
-        const data = await response.json();
+        const data = await res.json();
 
-        if (loading) loading.classList.add('hidden');
-
-        if (!data || data.length === 0) {
-          alert('ID siswa tidak terdaftar di database.');
+        if (!Array.isArray(data) || data.length === 0) {
+          showLoading(false);
+          alert("ID siswa tidak terdaftar di database.");
           return;
         }
 
         const student = data[0];
-        const studentInfo = document.getElementById('student-info');
+        const resultBox = document.getElementById("result-box");
+        const studentInfo = document.getElementById("student-info");
+
         if (studentInfo) {
-          studentInfo.innerHTML = `
-            <strong>${student.name}</strong><br>
-            Kelas: ${student.class} • ID: ${student.id}<br>
-            <span class="text-emerald-300 font-semibold">Status: Hadir Terverifikasi</span>
-          `;
+          studentInfo.innerHTML =
+            `<strong>${student.name}</strong><br>` +
+            `Kelas: ${student.class} • ID: ${student.id}<br>` +
+            `<span style="color:#a7f3d0;font-weight:700;">Status: Hadir Terverifikasi</span>`;
         }
 
-        const result = document.getElementById('result-container');
-        if (result) result.classList.remove('hidden');
+        if (resultBox) resultBox.classList.add("show");
 
-        const btnRescan = document.getElementById('btn-rescan');
-        if (btnRescan) btnRescan.classList.remove('hidden');
+        const btnRescan = document.getElementById("btn-rescan");
+        if (btnRescan) btnRescan.classList.remove("hidden");
 
         await fetch(`${SUPABASE_URL}/rest/v1/attendance`, {
-          method: 'POST',
+          method: "POST",
           headers: getSupabaseHeaders(),
           body: JSON.stringify({
             student_id: student.id,
-            status: 'present',
+            status: "present",
             scanned_at: new Date().toISOString()
           })
         });
@@ -295,27 +632,29 @@
         setTimeout(() => {
           window.location.href = waUrl;
         }, 1200);
+
       } catch (error) {
         console.error(error);
-        if (loading) loading.classList.add('hidden');
-        alert('Gagal memuat data dari server.');
+        alert("Gagal memuat data dari server.");
+      } finally {
+        showLoading(false);
       }
     }
 
     async function registerAndGenerate() {
-      const idSiswa = document.getElementById('gen-id').value.trim();
-      const nama = document.getElementById('gen-nama').value.trim();
-      const kelas = document.getElementById('gen-kelas').value.trim();
-      const hp = document.getElementById('gen-hp').value.trim();
+      const idSiswa = document.getElementById("gen-id").value.trim();
+      const nama = document.getElementById("gen-nama").value.trim();
+      const kelas = document.getElementById("gen-kelas").value.trim();
+      const hp = document.getElementById("gen-hp").value.trim();
 
       if (!idSiswa || !nama || !kelas || !hp) {
-        alert('Harap lengkapi seluruh data siswa.');
+        alert("Harap lengkapi seluruh data siswa.");
         return;
       }
 
-      const btnSave = document.getElementById('btn-save');
-      btnSave.innerText = 'Menyimpan...';
+      const btnSave = document.getElementById("btn-save");
       btnSave.disabled = true;
+      btnSave.textContent = "Menyimpan...";
 
       const payload = {
         id: idSiswa,
@@ -326,7 +665,7 @@
 
       try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/students`, {
-          method: 'POST',
+          method: "POST",
           headers: getSupabaseHeaders(),
           body: JSON.stringify(payload)
         });
@@ -334,55 +673,97 @@
         if (!response.ok) {
           const text = await response.text();
           console.error(text);
-          throw new Error('insert failed');
+          throw new Error("insert failed");
         }
 
         generatedStudentId = idSiswa;
-        const qrElement = document.getElementById('qrcode');
-        qrElement.innerHTML = '';
+
+        const qrElement = document.getElementById("qrcode");
+        qrElement.innerHTML = "";
 
         new QRCode(qrElement, {
           text: idSiswa,
           width: 200,
           height: 200,
-          colorDark: '#0f172a',
-          colorLight: '#ffffff',
+          colorDark: "#0f172a",
+          colorLight: "#ffffff",
           correctLevel: QRCode.CorrectLevel.H
         });
 
-        document.getElementById('qrcode-container').classList.remove('hidden');
+        document.getElementById("qrcode-wrap").classList.remove("hidden");
         setTimeout(() => {
-          downloadQRCode({ auto: true });
-        }, 300);
+          downloadQRCode(true);
+        }, 250);
 
-        alert('QR berhasil dibuat dan otomatis tersimpan. Buka tab Scanner bila siap untuk pindai.');
+        alert("QR berhasil dibuat dan otomatis tersimpan. Silakan buka tab Scanner untuk memindai.");
       } catch (error) {
         console.error(error);
-        alert('Gagal menyimpan data siswa.');
+        alert("Gagal menyimpan data siswa.");
       } finally {
-        btnSave.innerText = 'Simpan & Buat QR';
         btnSave.disabled = false;
+        btnSave.textContent = "Simpan & Buat QR";
       }
     }
 
-    function downloadQRCode(options = {}) {
-      const { auto = false } = options;
-      const qrEl = document.getElementById('qrcode');
-      const img = qrEl.querySelector('img') || qrEl.querySelector('canvas');
+    function downloadQRCode(auto = false) {
+      const qrBox = document.getElementById("qrcode");
+      if (!qrBox) return;
 
+      const img = qrBox.querySelector("img") || qrBox.querySelector("canvas");
       if (!img) {
-        if (!auto) alert('QR Code belum tersedia.');
+        if (!auto) alert("QR Code belum tersedia.");
         return;
       }
 
-      const imageUrl = img.tagName === 'CANVAS' ? img.toDataURL('image/png') : img.src;
-      const link = document.createElement('a');
-      link.href = imageUrl;
-      link.download = `Kartu-QR-${generatedStudentId || 'Siswa'}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const imageUrl = img.tagName === "CANVAS" ? img.toDataURL("image/png") : img.src;
+      const a = document.createElement("a");
+      a.href = imageUrl;
+      a.download = `Kartu-QR-${generatedStudentId || "Siswa"}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
+
+    function handleGalleryScan(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = document.getElementById("reader");
+      if (reader) reader.classList.remove("hidden");
+
+      const tempQr = new Html5Qrcode("reader");
+
+      tempQr.scanFile(file, true)
+        .then((decodedText) => {
+          tempQr.clear();
+          onScanSuccess(decodedText);
+        })
+        .catch(() => {
+          alert("QR Code tidak ditemukan pada gambar yang dipilih.");
+        })
+        .finally(() => {
+          event.target.value = "";
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      document.querySelectorAll(".tab-btn").forEach((button) => {
+        button.addEventListener("click", function () {
+          setActiveTab(this.dataset.tab);
+        });
+      });
+
+      document.getElementById("btn-start-camera").addEventListener("click", startCameraFromUserAction);
+      document.getElementById("btn-rescan").addEventListener("click", startCameraFromUserAction);
+      document.getElementById("btn-save").addEventListener("click", registerAndGenerate);
+      document.getElementById("btn-download-qr").addEventListener("click", function () {
+        downloadQRCode(false);
+      });
+      document.getElementById("btn-gallery").addEventListener("click", function () {
+        document.getElementById("file-input").click();
+      });
+      document.getElementById("file-input").addEventListener("change", handleGalleryScan);
+    });
   </script>
 </body>
 </html>
