@@ -54,7 +54,6 @@ jobs:
 
           export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
 
-          # Hindari broken pipe dari `yes` saat sdkmanager menutup stdin lebih cepat.
           yes 2>/dev/null | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$ANDROID_HOME" --licenses >/dev/null || true
 
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$ANDROID_HOME" --install \
@@ -72,3 +71,10 @@ jobs:
           ANDROID_HOME: ${{ github.workspace }}/android-sdk
           ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
         run: ./gradlew assembleRelease
+
+      - name: Upload APK artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk
+          path: android/app/build/outputs/apk/release/*.apk
