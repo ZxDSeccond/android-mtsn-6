@@ -10,10 +10,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 || secrets.keystore_base64 }}
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD || secrets.keystore_password }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS || secrets.key_alias }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD || secrets.key_password }}
 
     steps:
       - name: Checkout repository
@@ -84,9 +84,9 @@ jobs:
           ANDROID_HOME: ${{ github.workspace }}/android-sdk
           ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
           ANDROID_KEYSTORE: ${{ env.ANDROID_KEYSTORE }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD || secrets.keystore_password }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS || secrets.key_alias }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD || secrets.key_password }}
         run: ./gradlew assembleRelease
 
       - name: Upload APK artifact
