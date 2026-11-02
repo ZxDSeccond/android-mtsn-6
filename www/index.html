@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absensi Cloud - MTsN 6 Solok</title>
+    <title>Absensi Cloud - MTsN 6 Solok -ZxD</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -30,7 +30,7 @@
         <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-slate-950 font-extrabold shadow-lg shadow-emerald-500/20">
-                    ZX
+                    M6
                 </div>
                 <div>
                     <h1 class="text-sm font-bold text-white tracking-wide">MTsN 6 SOLOK</h1>
@@ -45,12 +45,12 @@
 
     <!-- Tab Navigasi -->
     <div class="max-w-md w-full mx-auto px-4 mt-4">
-        <div class="bg-slate-900 p-1 rounded-xl flex border border-slate-800 shadow-inner">
-            <button onclick="switchTab('scanner')" id="tab-scanner-btn" class="flex-1 py-2.5 text-xs font-bold rounded-lg bg-emerald-600 text-white shadow-md transition-all">
-                Scan kehadiran
+        <div class="bg-slate-900 p-1 rounded-lg flex border border-slate-800 shadow-inner">
+            <button onclick="switchTab('scanner')" id="tab-scanner-btn" class="flex-1 py-2.5 text-xs font-bold rounded-md bg-emerald-600 text-white shadow-md transition-all">
+                Scanner Kehadiran
             </button>
-            <button onclick="switchTab('generator')" id="tab-generator-btn" class="flex-1 py-2.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all">
-                daftarkan siswa
+            <button onclick="switchTab('generator')" id="tab-generator-btn" class="flex-1 py-2.5 text-xs font-semibold rounded-md text-slate-400 hover:text-white transition-all">
+                Pendaftaran Siswa
             </button>
         </div>
     </div>
@@ -62,12 +62,18 @@
         <div id="view-scanner" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
             <div class="flex items-center justify-between mb-3">
                 <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Pindai Kartu Siswa</h2>
-                <button onclick="initScanner()" class="text-xs text-emerald-400 font-semibold hover:text-emerald-300 transition-colors">
-                    refresh kamera
-                </button>
+                <div class="space-x-2">
+                    <button onclick="document.getElementById('file-input').click()" class="text-xs text-teal-400 font-semibold hover:text-teal-300 transition-colors">
+                        Pilih dari Galeri
+                    </button>
+                    <input type="file" id="file-input" accept="image/*" class="hidden" onchange="scanFromGallery(event)">
+                    <button onclick="initScanner()" class="text-xs text-emerald-400 font-semibold hover:text-emerald-300 transition-colors">
+                        Reset Kamera
+                    </button>
+                </div>
             </div>
 
-            <div id="reader" class="w-full rounded-xl overflow-hidden border border-slate-800 bg-slate-950 mb-4"></div>
+            <div id="reader" class="w-full rounded-xl overflow-hidden border border-slate-800 bg-slate-950 mb-4 min-h-[250px]"></div>
 
             <!-- Loading Modern RGB -->
             <div id="loading-scan" class="hidden flex flex-col items-center justify-center py-6 space-y-3">
@@ -81,11 +87,11 @@
                 <span class="inline-block text-emerald-400 font-bold text-sm mb-1">Absensi Berhasil Tercatat</span>
                 <p id="student-info" class="text-xs text-slate-300 mb-3 font-medium leading-relaxed"></p>
                 <div class="inline-flex items-center text-xs text-emerald-300 font-semibold bg-emerald-900/40 px-3 py-1.5 rounded-lg border border-emerald-500/20">
-                    Mengarahkan ke WhatsApp Orang Tua.
+                    Mengarahkan ke WhatsApp Orang Tua...
                 </div>
             </div>
 
-            <button id="btn-rescan" onclick="location.reload()" class="hidden mt-3 w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-3 px-4 rounded-xl shadow-lg shadow-emerald-600/20 transition-all">
+            <button id="btn-rescan" onclick="initScanner()" class="hidden mt-3 w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-3 px-4 rounded-xl shadow-lg shadow-emerald-600/20 transition-all">
                 Pindai Siswa Lain
             </button>
         </div>
@@ -117,10 +123,10 @@
             </div>
 
             <div id="qrcode-container" class="mt-5 flex flex-col items-center hidden pt-4 border-t border-slate-800">
-                <div id="qrcode" class="p-3 bg-white rounded-2xl shadow-xl mb-3"></div>
-                <a id="download-btn" class="w-full text-center bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold py-3 px-4 rounded-xl shadow cursor-pointer transition-colors">
-                    Hasil QR (.PNG)
-                </a>
+                <div id="qrcode" class="p-3 bg-white rounded-xl shadow-xl mb-3 flex justify-center items-center"></div>
+                <button onclick="downloadQRCode()" class="w-full text-center bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold py-3 px-4 rounded-xl shadow cursor-pointer transition-colors">
+                    Unduh Kartu QR (.PNG)
+                </button>
             </div>
         </div>
 
@@ -133,7 +139,9 @@
 
     <!-- Skrip Logika -->
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbyqSpvgy4euPWjIW2f2OEwmxCCK7z_3s0ueYjaYzFkR41KqTHunA7PshcC2j-ZNYHZu/exec";[span_1](start_span)[span_1](end_span)
+        const API_URL = "https://script.google.com/macros/s/AKfycbyqSpvgy4euPWjIW2f2OEwmxCCK7z_3s0ueYjaYzFkR41KqTHunA7PshcC2j-ZNYHZu/exec";
+
+        let html5QrCode = null;
 
         function switchTab(tab) {
             const scannerView = document.getElementById('view-scanner');
@@ -144,17 +152,120 @@
             if (tab === 'scanner') {
                 scannerView.classList.remove('hidden');
                 generatorView.classList.add('hidden');
-                scannerBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-lg bg-emerald-600 text-white shadow-md transition-all";
-                generatorBtn.className = "flex-1 py-2.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all";
-                initScanner();
+                scannerBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-md bg-emerald-600 text-white shadow-md transition-all";
+                generatorBtn.className = "flex-1 py-2.5 text-xs font-semibold rounded-md text-slate-400 hover:text-white transition-all";
+                setTimeout(() => initScanner(), 200);
             } else {
                 scannerView.classList.add('hidden');
                 generatorView.classList.remove('hidden');
-                generatorBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-lg bg-emerald-600 text-white shadow-md transition-all";
-                scannerBtn.className = "flex-1 py-2.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all";
-                if(html5QrCode) { html5QrCode.stop().catch(e => {}); }
+                generatorBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-md bg-emerald-600 text-white shadow-md transition-all";
+                scannerBtn.className = "flex-1 py-2.5 text-xs font-semibold rounded-md text-slate-400 hover:text-white transition-all";
+                stopScanner();
             }
         }
+
+        function stopScanner() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                }).catch(err => {
+                    console.log("Stop camera error: ", err);
+                });
+            }
+        }
+
+        function initScanner() {
+            document.getElementById("result-container").classList.add("hidden");
+            document.getElementById("btn-rescan").classList.add("hidden");
+            document.getElementById("loading-scan").classList.add("hidden");
+
+            if (html5QrCode) {
+                html5QrCode.stop().catch(() => {}).finally(() => {
+                    startCameraInstance();
+                });
+            } else {
+                startCameraInstance();
+            }
+        }
+
+        function startCameraInstance() {
+            html5QrCode = new Html5Qrcode("reader");
+            const config = { fps: 15, qrbox: { width: 220, height: 220 } };
+            
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                config, 
+                onScanSuccess, 
+                () => {}
+            ).catch(err => {
+                console.log("Kamera belakang gagal, mencoba kamera depan...", err);
+                html5QrCode.start(
+                    { facingMode: "user" }, 
+                    config, 
+                    onScanSuccess, 
+                    () => {}
+                ).catch(innerErr => {
+                    alert("Gagal mengakses kamera perangkat. Periksa izin akses kamera.");
+                });
+            });
+        }
+
+        function scanFromGallery(event) {
+            if (event.target.files.length === 0) return;
+            const imageFile = event.target.files[0];
+            
+            const readerObj = new Html5Qrcode("reader");
+            readerObj.scanFile(imageFile, true)
+                .then(decodedText => {
+                    readerObj.clear();
+                    onScanSuccess(decodedText);
+                })
+                .catch(err => {
+                    alert("QR Code tidak ditemukan pada gambar galeri yang dipilih.");
+                });
+        }
+
+        function onScanSuccess(decodedText) {
+            stopScanner();
+
+            let scannedId = decodedText.trim();
+            document.getElementById("loading-scan").classList.remove("hidden");
+
+            fetch(`${API_URL}?id=${encodeURIComponent(scannedId)}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("loading-scan").classList.add("hidden");
+
+                    if (data && data.id) {
+                        document.getElementById("student-info").innerHTML = `
+                            <strong>${data.name}</strong><br>
+                            Kelas: ${data.class} | ID: ${data.id}<br>
+                            <span class="text-emerald-400 font-semibold">Status: Terverifikasi Hadir</span>
+                        `;
+
+                        let pesanWA = `Assalamu'alaikum, memberitahukan bahwa ananda ${data.name} (${data.class}) telah hadir di MTsN 6 Solok hari ini. Terima kasih.`;
+                        let waUrl = `https://api.whatsapp.com/send?phone=${data.phone}&text=${encodeURIComponent(pesanWA)}`;
+
+                        document.getElementById("result-container").classList.remove("hidden");
+                        document.getElementById("btn-rescan").classList.remove("hidden");
+
+                        setTimeout(() => {
+                            window.location.href = waUrl;
+                        }, 1200);
+
+                    } else {
+                        alert("ID Siswa tidak terdaftar di database cloud");
+                        initScanner();
+                    }
+                })
+                .catch(err => {
+                    document.getElementById("loading-scan").classList.add("hidden");
+                    alert("Gagal memuat data dari server");
+                    initScanner();
+                });
+        }
+
+        let generatedStudentId = "";
 
         function registerAndGenerate() {
             let idSiswa = document.getElementById('gen-id').value.trim();
@@ -189,6 +300,7 @@
                 btnSave.disabled = false;
                 alert("Data siswa berhasil tersimpan secara otomatis");
 
+                generatedStudentId = idSiswa;
                 let qrElement = document.getElementById('qrcode');
                 qrElement.innerHTML = "";
 
@@ -203,15 +315,6 @@
 
                 document.getElementById('qrcode-container').classList.remove('hidden');
 
-                setTimeout(() => {
-                    let img = qrElement.querySelector('img') || qrElement.querySelector('canvas');
-                    let downloadBtn = document.getElementById('download-btn');
-                    if (img) {
-                        downloadBtn.href = img.tagName === 'CANVAS' ? img.toDataURL("image/png") : img.src;
-                        downloadBtn.download = `Kartu-QR-${idSiswa}.png`;
-                    }
-                }, 400);
-
             }).catch(err => {
                 btnSave.innerText = "Simpan Cloud & Buat QR";
                 btnSave.disabled = false;
@@ -219,79 +322,26 @@
             });
         }
 
-        let html5QrCode = null;
-        let isScanned = false;
-
-        function initScanner() {
-            isScanned = false;
-            document.getElementById("result-container").classList.add("hidden");
-            document.getElementById("btn-rescan").classList.add("hidden");
-            document.getElementById("loading-scan").classList.add("hidden");
-
-            if (html5QrCode) {
-                try { html5QrCode.stop(); } catch(e) {}
+        function downloadQRCode() {
+            let qrElement = document.getElementById('qrcode');
+            let img = qrElement.querySelector('img') || qrElement.querySelector('canvas');
+            if (img) {
+                let imageUrl = img.tagName === 'CANVAS' ? img.toDataURL("image/png") : img.src;
+                let downloadLink = document.createElement('a');
+                downloadLink.href = imageUrl;
+                downloadLink.download = `Kartu-QR-${generatedStudentId || 'Siswa'}.png`;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            } else {
+                alert("QR Code belum tersedia untuk diunduh.");
             }
-
-            html5QrCode = new Html5Qrcode("reader");
-            html5QrCode.start(
-                { facingMode: "environment" }, 
-                { fps: 20, qrbox: { width: 240, height: 240 } }, 
-                onScanSuccess, 
-                () => {}
-            ).catch(err => {
-                console.log("Kamera error: ", err);
-            });
-        }
-
-        function onScanSuccess(decodedText) {
-            if (isScanned) return;
-            isScanned = true;
-
-            if (html5QrCode) {
-                html5QrCode.stop().catch(err => {});
-            }
-
-            let scannedId = decodedText.trim();
-            document.getElementById("loading-scan").classList.remove("hidden");
-
-            fetch(`${API_URL}?id=${encodeURIComponent(scannedId)}`)
-                .then(res => res.json())
-                .then(data => {
-                    document.getElementById("loading-scan").classList.add("hidden");
-
-                    if (data && data.id) {
-                        document.getElementById("student-info").innerHTML = `
-                            <strong>${data.name}</strong><br>
-                            Kelas: ${data.class} | ID: ${data.id}<br>
-                            <span class="text-emerald-400 font-semibold">Status: Terverifikasi Hadir</span>
-                        `;
-
-                        let pesanWA = `Assalamu'alaikum, memberitahukan bahwa ananda ${data.name} (${data.class}) telah hadir di MTsN 6 Solok hari ini. Terima kasih.`;
-                        let waUrl = `https://api.whatsapp.com/send?phone=${data.phone}&text=${encodeURIComponent(pesanWA)}`;
-
-                        document.getElementById("result-container").classList.remove("hidden");
-                        document.getElementById("btn-rescan").classList.remove("hidden");
-
-                        setTimeout(() => {
-                            window.location.href = waUrl;
-                        }, 1200);
-
-                    } else {
-                        alert("ID Siswa tidak terdaftar di database cloud");
-                        isScanned = false;
-                        initScanner();
-                    }
-                })
-                .catch(err => {
-                    document.getElementById("loading-scan").classList.add("hidden");
-                    alert("Gagal memuat data dari server");
-                    isScanned = false;
-                    initScanner();
-                });
         }
 
         window.onload = () => {
-            initScanner();
+            setTimeout(() => {
+                initScanner();
+            }, 500);
         };
     </script>
 </body>
