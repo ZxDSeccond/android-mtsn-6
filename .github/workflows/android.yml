@@ -31,27 +31,34 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Install Android SDK
+      - name: Install Android SDK and accept licenses
         shell: bash
         env:
           ANDROID_HOME: ${{ github.workspace }}/android-sdk
           ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
         run: |
+          set -euxo pipefail
+
           mkdir -p "$ANDROID_HOME/cmdline-tools"
           cd "$HOME"
 
-          curl -L -o commandlinetools.zip \
-            https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          if [ ! -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
+            curl -L -o commandlinetools.zip \
+              https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
 
-          unzip -q commandlinetools.zip
-          mv cmdline-tools "$ANDROID_HOME/cmdline-tools/latest"
+            rm -rf "$ANDROID_HOME/cmdline-tools/latest"
+            unzip -q commandlinetools.zip
+            mkdir -p "$ANDROID_HOME/cmdline-tools"
+            mv cmdline-tools "$ANDROID_HOME/cmdline-tools/latest"
+          fi
 
           export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
 
+          yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses >/dev/null
           sdkmanager --sdk_root="$ANDROID_HOME" --install \
             "platform-tools" \
-            "platforms;android-34" \
-            "build-tools;34.0.0"
+            "platforms;android-33" \
+            "build-tools;33.0.0"
 
       - name: Make gradlew executable
         working-directory: android
