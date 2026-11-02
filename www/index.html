@@ -1,348 +1,312 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absensi Cloud - MTsN 6 Solok -ZxD</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        #reader video { width: 100% !important; height: auto !important; object-fit: cover; border-radius: 0.75rem; }
-        @keyframes rgb-spin {
-            0% { transform: rotate(0deg); filter: hue-rotate(0deg); }
-            50% { transform: rotate(180deg); filter: hue-rotate(180deg); }
-            100% { transform: rotate(360deg); filter: hue-rotate(360deg); }
-        }
-        .rgb-loader {
-            animation: rgb-spin 1.5s linear infinite;
-            background: linear-gradient(135deg, #10b981, #3b82f6, #ec4899, #8b5cf6, #10b981);
-            background-size: 300% 300%;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Absensi MTsN 6 Solok</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    #reader video { width: 100% !important; height: auto !important; object-fit: cover; border-radius: 1rem; }
+    .scan-shell { min-height: 210px; }
+    .bg-mesh {
+      background:
+        radial-gradient(circle at top, rgba(16,185,129,0.2), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(59,130,246,0.18), transparent 35%),
+        #020817;
+    }
+    .glass {
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+  </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
-
-    <!-- Header -->
-    <header class="w-full bg-slate-900 border-b border-slate-800 sticky top-0 z-40 shadow-lg">
-        <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-slate-950 font-extrabold shadow-lg shadow-emerald-500/20">
-                    M6
-                </div>
-                <div>
-                    <h1 class="text-sm font-bold text-white tracking-wide">MTsN 6 SOLOK</h1>
-                    <p class="text-[11px] text-emerald-400 font-medium">Sistem Absensi Terintegrasi</p>
-                </div>
-            </div>
-            <span class="text-[10px] bg-emerald-500/10 text-emerald-400 font-semibold px-2.5 py-1 rounded-full border border-emerald-500/20">
-                Cloud Active
-            </span>
+<body class="bg-mesh text-slate-100 min-h-screen">
+  <div class="mx-auto max-w-md min-h-screen px-4 pb-8 pt-4">
+    <header class="glass sticky top-3 z-40 rounded-2xl border border-slate-700/60 shadow-xl shadow-slate-950/40">
+      <div class="flex items-center justify-between px-4 py-3">
+        <div class="flex items-center gap-3">
+          <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 via-teal-400 to-cyan-500 text-lg font-black text-slate-950 shadow-lg shadow-emerald-500/30">M6</div>
+          <div>
+            <h1 class="text-[11px] font-bold uppercase tracking-[0.12em] text-white">MTsN 6 Solok</h1>
+            <p class="text-[10px] text-emerald-400">Sistem Absensi Digital</p>
+          </div>
         </div>
+        <span class="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-emerald-300">Online</span>
+      </div>
     </header>
 
-    <!-- Tab Navigasi -->
-    <div class="max-w-md w-full mx-auto px-4 mt-4">
-        <div class="bg-slate-900 p-1 rounded-lg flex border border-slate-800 shadow-inner">
-            <button onclick="switchTab('scanner')" id="tab-scanner-btn" class="flex-1 py-2.5 text-xs font-bold rounded-md bg-emerald-600 text-white shadow-md transition-all">
-                Scanner Kehadiran
-            </button>
-            <button onclick="switchTab('generator')" id="tab-generator-btn" class="flex-1 py-2.5 text-xs font-semibold rounded-md text-slate-400 hover:text-white transition-all">
-                Pendaftaran Siswa
-            </button>
-        </div>
-    </div>
+    <nav class="mt-4 rounded-2xl border border-slate-700/60 bg-slate-900/80 p-1.5 shadow-lg shadow-slate-950/30">
+      <div class="grid grid-cols-2 gap-1">
+        <button id="tab-scanner-btn" class="tab-button active" onclick="switchTab('scanner')">Scanner</button>
+        <button id="tab-generator-btn" class="tab-button" onclick="switchTab('generator')">Daftar Siswa</button>
+      </div>
+    </nav>
 
-    <!-- Konten Utama -->
-    <main class="max-w-md w-full mx-auto p-4 flex-1 flex flex-col justify-center">
-        
-        <!-- View Scanner -->
-        <div id="view-scanner" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
-            <div class="flex items-center justify-between mb-3">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Pindai Kartu Siswa</h2>
-                <div class="space-x-2">
-                    <button onclick="document.getElementById('file-input').click()" class="text-xs text-teal-400 font-semibold hover:text-teal-300 transition-colors">
-                        Pilih dari Galeri
-                    </button>
-                    <input type="file" id="file-input" accept="image/*" class="hidden" onchange="scanFromGallery(event)">
-                    <button onclick="initScanner()" class="text-xs text-emerald-400 font-semibold hover:text-emerald-300 transition-colors">
-                        Reset Kamera
-                    </button>
-                </div>
-            </div>
-
-            <div id="reader" class="w-full rounded-xl overflow-hidden border border-slate-800 bg-slate-950 mb-4 min-h-[250px]"></div>
-
-            <!-- Loading Modern RGB -->
-            <div id="loading-scan" class="hidden flex flex-col items-center justify-center py-6 space-y-3">
-                <div class="w-10 h-10 rounded-full rgb-loader p-0.5 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                    <div class="w-full h-full bg-slate-950 rounded-full"></div>
-                </div>
-                <p class="text-xs text-emerald-400 font-semibold animate-pulse tracking-wide">Menyelaraskan data cloud...</p>
-            </div>
-
-            <div id="result-container" class="hidden mt-3 p-4 bg-emerald-950/40 border border-emerald-500/30 rounded-xl text-center">
-                <span class="inline-block text-emerald-400 font-bold text-sm mb-1">Absensi Berhasil Tercatat</span>
-                <p id="student-info" class="text-xs text-slate-300 mb-3 font-medium leading-relaxed"></p>
-                <div class="inline-flex items-center text-xs text-emerald-300 font-semibold bg-emerald-900/40 px-3 py-1.5 rounded-lg border border-emerald-500/20">
-                    Mengarahkan ke WhatsApp Orang Tua...
-                </div>
-            </div>
-
-            <button id="btn-rescan" onclick="initScanner()" class="hidden mt-3 w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-3 px-4 rounded-xl shadow-lg shadow-emerald-600/20 transition-all">
-                Pindai Siswa Lain
-            </button>
+    <main class="mt-4 space-y-4">
+      <section id="view-scanner" class="panel">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Pindai Kehadiran</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="document.getElementById('file-input').click()" class="mini-button">Galeri</button>
+            <input type="file" id="file-input" accept="image/*" class="hidden" onchange="scanFromGallery(event)" />
+            <button onclick="initScanner()" class="mini-button">Reset</button>
+          </div>
         </div>
 
-        <!-- View Generator & Pendaftaran Otomatis -->
-        <div id="view-generator" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl hidden">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Registrasi Data Siswa Baru</h2>
-            
-            <div class="space-y-3.5 text-xs">
-                <div>
-                    <label class="block font-semibold text-slate-300 mb-1.5">ID / NISN Unik</label>
-                    <input type="text" id="gen-id" placeholder="Contoh: M6-001" class="w-full px-3.5 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-emerald-500 transition-colors">
-                </div>
-                <div>
-                    <label class="block font-semibold text-slate-300 mb-1.5">Nama Lengkap Siswa</label>
-                    <input type="text" id="gen-nama" placeholder="Contoh: Zidan Ramadan" class="w-full px-3.5 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-emerald-500 transition-colors">
-                </div>
-                <div>
-                    <label class="block font-semibold text-slate-300 mb-1.5">Kelas</label>
-                    <input type="text" id="gen-kelas" placeholder="Contoh: IX-A" class="w-full px-3.5 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-emerald-500 transition-colors">
-                </div>
-                <div>
-                    <label class="block font-semibold text-slate-300 mb-1.5">No. WhatsApp Orang Tua</label>
-                    <input type="text" id="gen-hp" placeholder="Contoh: 6281234567890" class="w-full px-3.5 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-emerald-500 transition-colors">
-                </div>
-                <button onclick="registerAndGenerate()" id="btn-save" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-600/20 transition-all mt-2">
-                    Simpan Cloud & Buat QR
-                </button>
-            </div>
+        <div id="reader" class="scan-shell overflow-hidden rounded-2xl border border-slate-700 bg-slate-950"></div>
 
-            <div id="qrcode-container" class="mt-5 flex flex-col items-center hidden pt-4 border-t border-slate-800">
-                <div id="qrcode" class="p-3 bg-white rounded-xl shadow-xl mb-3 flex justify-center items-center"></div>
-                <button onclick="downloadQRCode()" class="w-full text-center bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold py-3 px-4 rounded-xl shadow cursor-pointer transition-colors">
-                    Unduh Kartu QR (.PNG)
-                </button>
-            </div>
+        <div id="loading-scan" class="hidden py-5 text-center">
+          <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-emerald-400 via-cyan-400 to-violet-500 p-[2px] shadow-lg shadow-emerald-500/20">
+            <div class="h-full w-full rounded-full bg-slate-950"></div>
+          </div>
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-400 animate-pulse">Menyinkronkan data</p>
         </div>
 
+        <div id="result-container" class="hidden mt-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-center">
+          <div class="text-sm font-bold text-emerald-300">Berhasil Tercatat</div>
+          <p id="student-info" class="mt-2 text-xs leading-relaxed text-slate-200"></p>
+          <div class="mt-3 inline-flex rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-300">Mengirim notifikasi</div>
+        </div>
+
+        <button id="btn-rescan" onclick="initScanner()" class="hidden mt-4 w-full rounded-xl bg-emerald-500 px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400">Pindai Lagi</button>
+      </section>
+
+      <section id="view-generator" class="panel hidden">
+        <div class="mb-4">
+          <h2 class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Registrasi Siswa</h2>
+        </div>
+
+        <div class="space-y-3.5">
+          <label class="block">
+            <span class="mb-1.5 block text-[11px] font-semibold text-slate-300">ID / NISN</span>
+            <input id="gen-id" type="text" placeholder="Contoh: M6-001" class="input-field" />
+          </label>
+
+          <label class="block">
+            <span class="mb-1.5 block text-[11px] font-semibold text-slate-300">Nama Lengkap</span>
+            <input id="gen-nama" type="text" placeholder="Contoh: Zidan Ramadan" class="input-field" />
+          </label>
+
+          <label class="block">
+            <span class="mb-1.5 block text-[11px] font-semibold text-slate-300">Kelas</span>
+            <input id="gen-kelas" type="text" placeholder="Contoh: IX-A" class="input-field" />
+          </label>
+
+          <label class="block">
+            <span class="mb-1.5 block text-[11px] font-semibold text-slate-300">No. WhatsApp Orang Tua</span>
+            <input id="gen-hp" type="text" placeholder="Contoh: 6281234567890" class="input-field" />
+          </label>
+
+          <button id="btn-save" onclick="registerAndGenerate()" class="w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-white shadow-lg shadow-emerald-500/20 transition hover:brightness-110">Simpan & Buat QR</button>
+        </div>
+
+        <div id="qrcode-container" class="mt-5 hidden rounded-2xl border border-slate-700 bg-slate-950/60 p-4 text-center">
+          <div id="qrcode" class="mx-auto mb-3 flex w-[200px] items-center justify-center rounded-2xl bg-white p-3 shadow-xl"></div>
+          <button onclick="downloadQRCode()" class="w-full rounded-xl bg-slate-800 px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-slate-100 transition hover:bg-slate-700">Unduh QR</button>
+        </div>
+      </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="w-full py-4 text-center text-[11px] text-slate-500 border-t border-slate-800 mt-auto bg-slate-950">
-        &copy; 2026 ZxD &bull; MTsN 6 Solok, Sumatera Barat
+    <footer class="mt-6 pb-2 text-center text-[10px] uppercase tracking-[0.12em] text-slate-500">
+      © 2026 ZxD • MTsN 6 Solok
     </footer>
+  </div>
 
-    <!-- Skrip Logika -->
-    <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbyqSpvgy4euPWjIW2f2OEwmxCCK7z_3s0ueYjaYzFkR41KqTHunA7PshcC2j-ZNYHZu/exec";
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyqSpvgy4euPWjIW2f2OEwmxCCK7z_3s0ueYjaYzFkR41KqTHunA7PshcC2j-ZNYHZu/exec';
+    let html5QrCode = null;
+    let generatedStudentId = '';
 
-        let html5QrCode = null;
+    function switchTab(tab) {
+      const scannerView = document.getElementById('view-scanner');
+      const generatorView = document.getElementById('view-generator');
+      const scannerBtn = document.getElementById('tab-scanner-btn');
+      const generatorBtn = document.getElementById('tab-generator-btn');
 
-        function switchTab(tab) {
-            const scannerView = document.getElementById('view-scanner');
-            const generatorView = document.getElementById('view-generator');
-            const scannerBtn = document.getElementById('tab-scanner-btn');
-            const generatorBtn = document.getElementById('tab-generator-btn');
+      if (tab === 'scanner') {
+        scannerView.classList.remove('hidden');
+        generatorView.classList.add('hidden');
+        scannerBtn.classList.add('active');
+        generatorBtn.classList.remove('active');
+        setTimeout(() => initScanner(), 200);
+      } else {
+        scannerView.classList.add('hidden');
+        generatorView.classList.remove('hidden');
+        generatorBtn.classList.add('active');
+        scannerBtn.classList.remove('active');
+        stopScanner();
+      }
+    }
 
-            if (tab === 'scanner') {
-                scannerView.classList.remove('hidden');
-                generatorView.classList.add('hidden');
-                scannerBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-md bg-emerald-600 text-white shadow-md transition-all";
-                generatorBtn.className = "flex-1 py-2.5 text-xs font-semibold rounded-md text-slate-400 hover:text-white transition-all";
-                setTimeout(() => initScanner(), 200);
-            } else {
-                scannerView.classList.add('hidden');
-                generatorView.classList.remove('hidden');
-                generatorBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-md bg-emerald-600 text-white shadow-md transition-all";
-                scannerBtn.className = "flex-1 py-2.5 text-xs font-semibold rounded-md text-slate-400 hover:text-white transition-all";
-                stopScanner();
-            }
-        }
+    function stopScanner() {
+      if (html5QrCode) {
+        html5QrCode.stop().then(() => html5QrCode.clear()).catch(() => {});
+      }
+    }
 
-        function stopScanner() {
-            if (html5QrCode) {
-                html5QrCode.stop().then(() => {
-                    html5QrCode.clear();
-                }).catch(err => {
-                    console.log("Stop camera error: ", err);
-                });
-            }
-        }
+    function initScanner() {
+      document.getElementById('result-container').classList.add('hidden');
+      document.getElementById('btn-rescan').classList.add('hidden');
+      document.getElementById('loading-scan').classList.add('hidden');
 
-        function initScanner() {
-            document.getElementById("result-container").classList.add("hidden");
-            document.getElementById("btn-rescan").classList.add("hidden");
-            document.getElementById("loading-scan").classList.add("hidden");
+      if (html5QrCode) {
+        html5QrCode.stop().catch(() => {}).finally(() => startCameraInstance());
+      } else {
+        startCameraInstance();
+      }
+    }
 
-            if (html5QrCode) {
-                html5QrCode.stop().catch(() => {}).finally(() => {
-                    startCameraInstance();
-                });
-            } else {
-                startCameraInstance();
-            }
-        }
+    function startCameraInstance() {
+      html5QrCode = new Html5Qrcode('reader');
+      const config = { fps: 15, qrbox: { width: 220, height: 220 } };
 
-        function startCameraInstance() {
-            html5QrCode = new Html5Qrcode("reader");
-            const config = { fps: 15, qrbox: { width: 220, height: 220 } };
-            
-            html5QrCode.start(
-                { facingMode: "environment" }, 
-                config, 
-                onScanSuccess, 
-                () => {}
-            ).catch(err => {
-                console.log("Kamera belakang gagal, mencoba kamera depan...", err);
-                html5QrCode.start(
-                    { facingMode: "user" }, 
-                    config, 
-                    onScanSuccess, 
-                    () => {}
-                ).catch(innerErr => {
-                    alert("Gagal mengakses kamera perangkat. Periksa izin akses kamera.");
-                });
-            });
-        }
+      html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess, () => {})
+        .catch(() => {
+          html5QrCode.start({ facingMode: 'user' }, config, onScanSuccess, () => {})
+            .catch(() => alert('Tidak dapat mengakses kamera. Periksa izin kamera HP Anda.'));
+        });
+    }
 
-        function scanFromGallery(event) {
-            if (event.target.files.length === 0) return;
-            const imageFile = event.target.files[0];
-            
-            const readerObj = new Html5Qrcode("reader");
-            readerObj.scanFile(imageFile, true)
-                .then(decodedText => {
-                    readerObj.clear();
-                    onScanSuccess(decodedText);
-                })
-                .catch(err => {
-                    alert("QR Code tidak ditemukan pada gambar galeri yang dipilih.");
-                });
-        }
+    function scanFromGallery(event) {
+      if (event.target.files.length === 0) return;
 
-        function onScanSuccess(decodedText) {
-            stopScanner();
+      const file = event.target.files[0];
+      const readerObj = new Html5Qrcode('reader');
 
-            let scannedId = decodedText.trim();
-            document.getElementById("loading-scan").classList.remove("hidden");
+      readerObj.scanFile(file, true)
+        .then(decodedText => {
+          readerObj.clear();
+          onScanSuccess(decodedText);
+        })
+        .catch(() => {
+          alert('QR Code tidak ditemukan di gambar yang dipilih.');
+        });
+    }
 
-            fetch(`${API_URL}?id=${encodeURIComponent(scannedId)}`)
-                .then(res => res.json())
-                .then(data => {
-                    document.getElementById("loading-scan").classList.add("hidden");
+    function onScanSuccess(decodedText) {
+      stopScanner();
+      const studentId = decodedText.trim();
+      document.getElementById('loading-scan').classList.remove('hidden');
 
-                    if (data && data.id) {
-                        document.getElementById("student-info").innerHTML = `
-                            <strong>${data.name}</strong><br>
-                            Kelas: ${data.class} | ID: ${data.id}<br>
-                            <span class="text-emerald-400 font-semibold">Status: Terverifikasi Hadir</span>
-                        `;
+      fetch(`${API_URL}?id=${encodeURIComponent(studentId)}`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('loading-scan').classList.add('hidden');
 
-                        let pesanWA = `Assalamu'alaikum, memberitahukan bahwa ananda ${data.name} (${data.class}) telah hadir di MTsN 6 Solok hari ini. Terima kasih.`;
-                        let waUrl = `https://api.whatsapp.com/send?phone=${data.phone}&text=${encodeURIComponent(pesanWA)}`;
+          if (data && data.id) {
+            document.getElementById('student-info').innerHTML = `
+              <strong>${data.name}</strong><br>
+              Kelas: ${data.class} • ID: ${data.id}<br>
+              <span class="text-emerald-300 font-semibold">Status: Hadir Terverifikasi</span>
+            `;
 
-                        document.getElementById("result-container").classList.remove("hidden");
-                        document.getElementById("btn-rescan").classList.remove("hidden");
+            const message = `Assalamu'alaikum, memberitahukan bahwa ananda ${data.name} (${data.class}) telah hadir di MTsN 6 Solok hari ini. Terima kasih.`;
+            const waUrl = `https://api.whatsapp.com/send?phone=${data.phone}&text=${encodeURIComponent(message)}`;
 
-                        setTimeout(() => {
-                            window.location.href = waUrl;
-                        }, 1200);
+            document.getElementById('result-container').classList.remove('hidden');
+            document.getElementById('btn-rescan').classList.remove('hidden');
 
-                    } else {
-                        alert("ID Siswa tidak terdaftar di database cloud");
-                        initScanner();
-                    }
-                })
-                .catch(err => {
-                    document.getElementById("loading-scan").classList.add("hidden");
-                    alert("Gagal memuat data dari server");
-                    initScanner();
-                });
-        }
-
-        let generatedStudentId = "";
-
-        function registerAndGenerate() {
-            let idSiswa = document.getElementById('gen-id').value.trim();
-            let nama = document.getElementById('gen-nama').value.trim();
-            let kelas = document.getElementById('gen-kelas').value.trim();
-            let hp = document.getElementById('gen-hp').value.trim();
-
-            if (!idSiswa || !nama || !kelas || !hp) {
-                alert("Harap lengkapi seluruh data siswa");
-                return;
-            }
-
-            let btnSave = document.getElementById('btn-save');
-            btnSave.innerText = "Menyimpan ke Cloud...";
-            btnSave.disabled = true;
-
-            let payload = {
-                action: "register",
-                id: idSiswa,
-                name: nama,
-                class: kelas,
-                phone: hp
-            };
-
-            fetch(API_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            }).then(() => {
-                btnSave.innerText = "Simpan Cloud & Buat QR";
-                btnSave.disabled = false;
-                alert("Data siswa berhasil tersimpan secara otomatis");
-
-                generatedStudentId = idSiswa;
-                let qrElement = document.getElementById('qrcode');
-                qrElement.innerHTML = "";
-
-                new QRCode(qrElement, {
-                    text: idSiswa,
-                    width: 200,
-                    height: 200,
-                    colorDark : "#0f172a",
-                    colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.H
-                });
-
-                document.getElementById('qrcode-container').classList.remove('hidden');
-
-            }).catch(err => {
-                btnSave.innerText = "Simpan Cloud & Buat QR";
-                btnSave.disabled = false;
-                alert("Koneksi jaringan bermasalah");
-            });
-        }
-
-        function downloadQRCode() {
-            let qrElement = document.getElementById('qrcode');
-            let img = qrElement.querySelector('img') || qrElement.querySelector('canvas');
-            if (img) {
-                let imageUrl = img.tagName === 'CANVAS' ? img.toDataURL("image/png") : img.src;
-                let downloadLink = document.createElement('a');
-                downloadLink.href = imageUrl;
-                downloadLink.download = `Kartu-QR-${generatedStudentId || 'Siswa'}.png`;
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
-            } else {
-                alert("QR Code belum tersedia untuk diunduh.");
-            }
-        }
-
-        window.onload = () => {
             setTimeout(() => {
-                initScanner();
-            }, 500);
-        };
-    </script>
+              window.location.href = waUrl;
+            }, 1200);
+          } else {
+            alert('ID siswa tidak terdaftar di database cloud.');
+            initScanner();
+          }
+        })
+        .catch(() => {
+          document.getElementById('loading-scan').classList.add('hidden');
+          alert('Gagal memuat data dari server.');
+          initScanner();
+        });
+    }
+
+    function registerAndGenerate() {
+      const idSiswa = document.getElementById('gen-id').value.trim();
+      const nama = document.getElementById('gen-nama').value.trim();
+      const kelas = document.getElementById('gen-kelas').value.trim();
+      const hp = document.getElementById('gen-hp').value.trim();
+
+      if (!idSiswa || !nama || !kelas || !hp) {
+        alert('Harap lengkapi seluruh data siswa.');
+        return;
+      }
+
+      const btnSave = document.getElementById('btn-save');
+      btnSave.innerText = 'Menyimpan...';
+      btnSave.disabled = true;
+
+      const payload = {
+        action: 'register',
+        id: idSiswa,
+        name: nama,
+        class: kelas,
+        phone: hp
+      };
+
+      fetch(API_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(() => {
+        btnSave.innerText = 'Simpan & Buat QR';
+        btnSave.disabled = false;
+        alert('Data siswa berhasil tersimpan di cloud.');
+
+        generatedStudentId = idSiswa;
+        const qrElement = document.getElementById('qrcode');
+        qrElement.innerHTML = '';
+
+        new QRCode(qrElement, {
+          text: idSiswa,
+          width: 200,
+          height: 200,
+          colorDark: '#0f172a',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.H
+        });
+
+        document.getElementById('qrcode-container').classList.remove('hidden');
+      }).catch(() => {
+        btnSave.innerText = 'Simpan & Buat QR';
+        btnSave.disabled = false;
+        alert('Koneksi jaringan bermasalah.');
+      });
+    }
+
+    function downloadQRCode() {
+      const qrEl = document.getElementById('qrcode');
+      const img = qrEl.querySelector('img') || qrEl.querySelector('canvas');
+
+      if (!img) {
+        alert('QR Code belum tersedia.');
+        return;
+      }
+
+      const imageUrl = img.tagName === 'CANVAS' ? img.toDataURL('image/png') : img.src;
+      const link = document.createElement('a');
+      link.href = imageUrl;
+      link.download = `Kartu-QR-${generatedStudentId || 'Siswa'}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    window.onload = () => {
+      setTimeout(() => initScanner(), 400);
+    };
+  </script>
 </body>
 </html>

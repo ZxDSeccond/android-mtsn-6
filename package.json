@@ -4,6 +4,8 @@
   "description": "Aplikasi Absensi QR Code MTsN 6 Solok",
   "main": "index.js",
   "scripts": {
+    "build": "echo \"Static Capacitor web app ready\"",
+    "sync:android": "npx cap sync android",
     "test": "echo \"Error: no test specified\" && exit 0"
   },
   "dependencies": {
