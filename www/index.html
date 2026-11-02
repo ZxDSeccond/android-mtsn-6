@@ -702,23 +702,36 @@
           body: JSON.stringify(payload)
         });
 
-        const text = await response.text();
-        let data = null;
+        const rawText = await response.text();
+        console.log("INSERT STATUS:", response.status);
+        console.log("INSERT RAW RESPONSE:", rawText);
 
-        try {
-          data = text ? JSON.parse(text) : null;
-        } catch (e) {
-          data = null;
+        let parsed = null;
+
+        if (rawText) {
+          try {
+            parsed = JSON.parse(rawText);
+          } catch (e) {
+            parsed = null;
+          }
         }
 
         if (!response.ok) {
-          const details = data && data[0] && data[0].message ? data[0].message : text;
-          throw new Error(details || "Insert ke database gagal.");
+          const errMessage =
+            (parsed && parsed[0] && parsed[0].message) ||
+            rawText ||
+            "Insert gagal";
+
+          throw new Error(errMessage);
         }
 
         generatedStudentId = idSiswa;
 
         const qrElement = document.getElementById("qrcode");
+        if (!qrElement) {
+          throw new Error("QR container tidak ditemukan.");
+        }
+
         qrElement.innerHTML = "";
 
         new QRCode(qrElement, {
@@ -730,14 +743,19 @@
           correctLevel: QRCode.CorrectLevel.H
         });
 
-        document.getElementById("qrcode-wrap").classList.remove("hidden");
+        const wrap = document.getElementById("qrcode-wrap");
+        if (wrap) {
+          wrap.classList.remove("hidden");
+        }
+
         setTimeout(() => {
           downloadQRCode(true);
         }, 250);
 
         alert("QR berhasil dibuat dan otomatis tersimpan. Silakan buka tab Scanner untuk memindai.");
       } catch (error) {
-        console.error(error);
+        console.error("REGISTER ERROR:", error);
+
         const message = error && error.message ? error.message : "Gagal menyimpan data siswa.";
         showError(`Gagal menyimpan data siswa. ${message}. Pastikan policy insert tabel students di Supabase sudah diizinkan untuk anon/public.`, "error-box-form");
         alert(`Gagal menyimpan data siswa. ${message}`);
