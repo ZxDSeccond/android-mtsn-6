@@ -54,8 +54,10 @@ jobs:
 
           export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
 
-          yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses >/dev/null
-          sdkmanager --sdk_root="$ANDROID_HOME" --install \
+          # Hindari broken pipe dari `yes` saat sdkmanager menutup stdin lebih cepat.
+          yes 2>/dev/null | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$ANDROID_HOME" --licenses >/dev/null || true
+
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$ANDROID_HOME" --install \
             "platform-tools" \
             "platforms;android-33" \
             "build-tools;33.0.0"
