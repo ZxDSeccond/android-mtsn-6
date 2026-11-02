@@ -23,19 +23,14 @@ jobs:
           java-version: "17"
           cache: gradle
 
-      - name: Set up Android SDK
+      - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: 11.0
 
-      - name: Configure git
+      - name: Install Android SDK packages
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - name: Sync with remote branch before push
-        run: |
-          CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-          git fetch origin
-          git pull --rebase origin "$CURRENT_BRANCH" || true
+          sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" "cmdline-tools;latest"
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
@@ -45,13 +40,3 @@ jobs:
 
       - name: Build release AAB
         run: ./gradlew bundleRelease
-
-      - name: Commit generated changes if any
-        run: |
-          git add .
-          git diff --cached --quiet || git commit -m "Update Android build artifacts"
-
-      - name: Push changes to remote
-        run: |
-          CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-          git push origin HEAD:"$CURRENT_BRANCH"
