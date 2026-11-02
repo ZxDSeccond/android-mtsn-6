@@ -11,36 +11,46 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         #reader video { width: 100% !important; height: auto !important; object-fit: cover; border-radius: 0.75rem; }
+        @keyframes rgb-spin {
+            0% { transform: rotate(0deg); filter: hue-rotate(0deg); }
+            50% { transform: rotate(180deg); filter: hue-rotate(180deg); }
+            100% { transform: rotate(360deg); filter: hue-rotate(360deg); }
+        }
+        .rgb-loader {
+            animation: rgb-spin 1.5s linear infinite;
+            background: linear-gradient(135deg, #10b981, #3b82f6, #ec4899, #8b5cf6, #10b981);
+            background-size: 300% 300%;
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
 
     <!-- Header -->
-    <header class="w-full bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <header class="w-full bg-slate-900 border-b border-slate-800 sticky top-0 z-40 shadow-lg">
         <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-2.5">
-                <div class="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold shadow-md shadow-emerald-600/20">
-                    M6
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-slate-950 font-extrabold shadow-lg shadow-emerald-500/20">
+                    ZX
                 </div>
                 <div>
-                    <h1 class="text-sm font-bold text-slate-900 leading-tight">MTsN 6 Solok</h1>
-                    <p class="text-[11px] text-emerald-600 font-medium">Cloud Database Active</p>
+                    <h1 class="text-sm font-bold text-white tracking-wide">MTsN 6 SOLOK</h1>
+                    <p class="text-[11px] text-emerald-400 font-medium">Sistem Absensi Terintegrasi</p>
                 </div>
             </div>
-            <span class="text-[10px] bg-emerald-50 text-emerald-700 font-semibold px-2.5 py-1 rounded-full border border-emerald-200/60">
-                Online Sync
+            <span class="text-[10px] bg-emerald-500/10 text-emerald-400 font-semibold px-2.5 py-1 rounded-full border border-emerald-500/20">
+                Cloud Active
             </span>
         </div>
     </header>
 
     <!-- Tab Navigasi -->
     <div class="max-w-md w-full mx-auto px-4 mt-4">
-        <div class="bg-slate-200/70 p-1 rounded-xl flex shadow-inner">
-            <button onclick="switchTab('scanner')" id="tab-scanner-btn" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-white text-emerald-700 shadow-sm transition-all">
-                📷 Scan Absen Asli
+        <div class="bg-slate-900 p-1 rounded-xl flex border border-slate-800 shadow-inner">
+            <button onclick="switchTab('scanner')" id="tab-scanner-btn" class="flex-1 py-2.5 text-xs font-bold rounded-lg bg-emerald-600 text-white shadow-md transition-all">
+                Scan kehadiran
             </button>
-            <button onclick="switchTab('generator')" id="tab-generator-btn" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all">
-                🪪 Pendaftaran & QR
+            <button onclick="switchTab('generator')" id="tab-generator-btn" class="flex-1 py-2.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all">
+                daftarkan siswa
             </button>
         </div>
     </div>
@@ -49,63 +59,67 @@
     <main class="max-w-md w-full mx-auto p-4 flex-1 flex flex-col justify-center">
         
         <!-- View Scanner -->
-        <div id="view-scanner" class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
+        <div id="view-scanner" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
             <div class="flex items-center justify-between mb-3">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Scanner Kehadiran Siswa</h2>
-                <button onclick="initScanner()" class="text-xs text-emerald-600 font-semibold hover:underline">
-                    Reset Kamera 🔄
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Pindai Kartu Siswa</h2>
+                <button onclick="initScanner()" class="text-xs text-emerald-400 font-semibold hover:text-emerald-300 transition-colors">
+                    refresh kamera
                 </button>
             </div>
 
-            <div id="reader" class="w-full rounded-xl overflow-hidden border border-slate-200 bg-slate-900 mb-3"></div>
+            <div id="reader" class="w-full rounded-xl overflow-hidden border border-slate-800 bg-slate-950 mb-4"></div>
 
-            <div id="loading-scan" class="hidden text-center py-2 text-xs text-emerald-600 font-medium animate-pulse">
-                🔍 Memeriksa database cloud...
+            <!-- Loading Modern RGB -->
+            <div id="loading-scan" class="hidden flex flex-col items-center justify-center py-6 space-y-3">
+                <div class="w-10 h-10 rounded-full rgb-loader p-0.5 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <div class="w-full h-full bg-slate-950 rounded-full"></div>
+                </div>
+                <p class="text-xs text-emerald-400 font-semibold animate-pulse tracking-wide">Menyelaraskan data cloud...</p>
             </div>
 
-            <div id="result-container" class="hidden mt-3 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-center">
-                <span class="inline-block text-emerald-700 font-bold text-sm mb-1">✨ Absensi Berhasil Tercatat!</span>
-                <p id="student-info" class="text-xs text-slate-700 mb-3 font-medium"></p>
-                <div class="inline-flex items-center text-xs text-emerald-600 font-semibold bg-white px-3 py-1.5 rounded-lg border border-emerald-200 shadow-sm">
-                    Membuka WhatsApp Orang Tua... 🚀
+            <div id="result-container" class="hidden mt-3 p-4 bg-emerald-950/40 border border-emerald-500/30 rounded-xl text-center">
+                <span class="inline-block text-emerald-400 font-bold text-sm mb-1">Absensi Berhasil Tercatat</span>
+                <p id="student-info" class="text-xs text-slate-300 mb-3 font-medium leading-relaxed"></p>
+                <div class="inline-flex items-center text-xs text-emerald-300 font-semibold bg-emerald-900/40 px-3 py-1.5 rounded-lg border border-emerald-500/20">
+                    Mengarahkan ke WhatsApp Orang Tua.
                 </div>
             </div>
 
-            <button id="btn-rescan" onclick="location.reload()" class="hidden mt-3 w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2.5 px-4 rounded-xl shadow-md transition-all">
-                Scan Siswa Lain
+            <button id="btn-rescan" onclick="location.reload()" class="hidden mt-3 w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-3 px-4 rounded-xl shadow-lg shadow-emerald-600/20 transition-all">
+                Pindai Siswa Lain
             </button>
         </div>
 
         <!-- View Generator & Pendaftaran Otomatis -->
-        <div id="view-generator" class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm hidden">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Daftar & Cetak Kartu Siswa</h2>
+        <div id="view-generator" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl hidden">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Registrasi Data Siswa Baru</h2>
             
             <div class="space-y-3.5 text-xs">
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1.5">ID / NISN Unik</label>
-                    <input type="text" id="gen-id" placeholder="Contoh: M6-001" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:border-emerald-500">
+                    <label class="block font-semibold text-slate-300 mb-1.5">ID / NISN Unik</label>
+                    <input type="text" id="gen-id" placeholder="Contoh: M6-001" class="w-full px-3.5 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-emerald-500 transition-colors">
                 </div>
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1.5">Nama Lengkap Siswa</label>
-                    <input type="text" id="gen-nama" placeholder="Contoh: Zidan Ramadan" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:border-emerald-500">
+                    <label class="block font-semibold text-slate-300 mb-1.5">Nama Lengkap Siswa</label>
+                    <input type="text" id="gen-nama" placeholder="Contoh: Zidan Ramadan" class="w-full px-3.5 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-emerald-500 transition-colors">
                 </div>
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1.5">Kelas</label>
-                    <input type="text" id="gen-kelas" placeholder="Contoh: IX-A" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:border-emerald-500">
+                    <label class="block font-semibold text-slate-300 mb-1.5">Kelas</label>
+                    <input type="text" id="gen-kelas" placeholder="Contoh: IX-A" class="w-full px-3.5 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-emerald-500 transition-colors">
                 </div>
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1.5">No. WhatsApp Orang Tua</label>
-                    <input type="text" id="gen-hp" placeholder="Contoh: 6281234567890" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:border-emerald-500">
+                    <label class="block font-semibold text-slate-300 mb-1.5">No. WhatsApp Orang Tua</label>
+                    <input type="text" id="gen-hp" placeholder="Contoh: 6281234567890" class="w-full px-3.5 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-emerald-500 transition-colors">
                 </div>
-                <button onclick="registerAndGenerate()" id="btn-save" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-md transition-all mt-1">
-                    Simpan ke Sheets & Buat QR 📱
+                <button onclick="registerAndGenerate()" id="btn-save" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-600/20 transition-all mt-2">
+                    Simpan Cloud & Buat QR
                 </button>
             </div>
 
-            <div id="qrcode-container" class="mt-5 flex flex-col items-center hidden pt-4 border-t border-slate-100">
-                <div id="qrcode" class="p-3 bg-white rounded-2xl border border-slate-200 shadow-sm mb-3"></div>
-                <a id="download-btn" class="w-full text-center bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold py-2.5 px-4 rounded-xl shadow cursor-pointer">
-                    Download Kartu QR (.PNG) 📥
+            <div id="qrcode-container" class="mt-5 flex flex-col items-center hidden pt-4 border-t border-slate-800">
+                <div id="qrcode" class="p-3 bg-white rounded-2xl shadow-xl mb-3"></div>
+                <a id="download-btn" class="w-full text-center bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold py-3 px-4 rounded-xl shadow cursor-pointer transition-colors">
+                    Hasil QR (.PNG)
                 </a>
             </div>
         </div>
@@ -113,14 +127,13 @@
     </main>
 
     <!-- Footer -->
-    <footer class="w-full py-4 text-center text-[11px] text-slate-400 border-t border-slate-200/60 mt-auto bg-white">
-        &copy; 2026 ZxD ~ MTsN 6 Solok, Sumatera Barat &bull; Cloud Integration
+    <footer class="w-full py-4 text-center text-[11px] text-slate-500 border-t border-slate-800 mt-auto bg-slate-950">
+        &copy; 2026 ZxD &bull; MTsN 6 Solok, Sumatera Barat
     </footer>
 
-    <!-- Skrip Logika Koneksi Cloud -->
+    <!-- Skrip Logika -->
     <script>
-        // URL Web App Google Sheets kamu
-        const API_URL = "https://script.google.com/macros/s/AKfycbwWFcQ0cWiu024WQLHestrNEoEN5zEZhXS4vWk60lL5DASc1gCbbI6htgnFyPvZg-LC/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbyqSpvgy4euPWjIW2f2OEwmxCCK7z_3s0ueYjaYzFkR41KqTHunA7PshcC2j-ZNYHZu/exec";[span_1](start_span)[span_1](end_span)
 
         function switchTab(tab) {
             const scannerView = document.getElementById('view-scanner');
@@ -131,19 +144,18 @@
             if (tab === 'scanner') {
                 scannerView.classList.remove('hidden');
                 generatorView.classList.add('hidden');
-                scannerBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-white text-emerald-700 shadow-sm transition-all";
-                generatorBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all";
+                scannerBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-lg bg-emerald-600 text-white shadow-md transition-all";
+                generatorBtn.className = "flex-1 py-2.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all";
                 initScanner();
             } else {
                 scannerView.classList.add('hidden');
                 generatorView.classList.remove('hidden');
-                generatorBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-white text-emerald-700 shadow-sm transition-all";
-                scannerBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all";
+                generatorBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-lg bg-emerald-600 text-white shadow-md transition-all";
+                scannerBtn.className = "flex-1 py-2.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all";
                 if(html5QrCode) { html5QrCode.stop().catch(e => {}); }
             }
         }
 
-        // Fungsi Daftar Otomatis ke Google Sheets & Generate QR
         function registerAndGenerate() {
             let idSiswa = document.getElementById('gen-id').value.trim();
             let nama = document.getElementById('gen-nama').value.trim();
@@ -151,7 +163,7 @@
             let hp = document.getElementById('gen-hp').value.trim();
 
             if (!idSiswa || !nama || !kelas || !hp) {
-                alert("Harap lengkapi semua data siswa, ZxD!");
+                alert("Harap lengkapi seluruh data siswa");
                 return;
             }
 
@@ -167,18 +179,16 @@
                 phone: hp
             };
 
-            // Kirim data otomatis ke Google Sheets via Fetch API
             fetch(API_URL, {
                 method: "POST",
                 mode: "no-cors",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             }).then(() => {
-                btnSave.innerText = "Simpan ke Sheets & Buat QR 📱";
+                btnSave.innerText = "Simpan Cloud & Buat QR";
                 btnSave.disabled = false;
-                alert("Data siswa berhasil tersimpan otomatis di Google Sheets!");
+                alert("Data siswa berhasil tersimpan secara otomatis");
 
-                // Generate QR Code yang berisi ID unik saja (Aman & Ringan)
                 let qrElement = document.getElementById('qrcode');
                 qrElement.innerHTML = "";
 
@@ -203,9 +213,9 @@
                 }, 400);
 
             }).catch(err => {
-                btnSave.innerText = "Simpan ke Sheets & Buat QR 📱";
+                btnSave.innerText = "Simpan Cloud & Buat QR";
                 btnSave.disabled = false;
-                alert("Gagal terhubung ke database cloud. Periksa koneksi internet!");
+                alert("Koneksi jaringan bermasalah");
             });
         }
 
@@ -216,6 +226,7 @@
             isScanned = false;
             document.getElementById("result-container").classList.add("hidden");
             document.getElementById("btn-rescan").classList.add("hidden");
+            document.getElementById("loading-scan").classList.add("hidden");
 
             if (html5QrCode) {
                 try { html5QrCode.stop(); } catch(e) {}
@@ -232,7 +243,6 @@
             });
         }
 
-        // Fungsi Saat QR Code Siswa Discan Kamera
         function onScanSuccess(decodedText) {
             if (isScanned) return;
             isScanned = true;
@@ -244,8 +254,7 @@
             let scannedId = decodedText.trim();
             document.getElementById("loading-scan").classList.remove("hidden");
 
-            // Ambil data asli langsung dari Google Sheets berdasarkan ID yang diskan
-            fetch(`${API_URL}?id=${scannedId}`)
+            fetch(`${API_URL}?id=${encodeURIComponent(scannedId)}`)
                 .then(res => res.json())
                 .then(data => {
                     document.getElementById("loading-scan").classList.add("hidden");
@@ -254,7 +263,7 @@
                         document.getElementById("student-info").innerHTML = `
                             <strong>${data.name}</strong><br>
                             Kelas: ${data.class} | ID: ${data.id}<br>
-                            <span class="text-emerald-600 font-semibold">Status: Hadir Terverifikasi</span>
+                            <span class="text-emerald-400 font-semibold">Status: Terverifikasi Hadir</span>
                         `;
 
                         let pesanWA = `Assalamu'alaikum, memberitahukan bahwa ananda ${data.name} (${data.class}) telah hadir di MTsN 6 Solok hari ini. Terima kasih.`;
@@ -268,14 +277,14 @@
                         }, 1200);
 
                     } else {
-                        alert("ID Siswa tidak ditemukan di database Google Sheets!");
+                        alert("ID Siswa tidak terdaftar di database cloud");
                         isScanned = false;
                         initScanner();
                     }
                 })
                 .catch(err => {
                     document.getElementById("loading-scan").classList.add("hidden");
-                    alert("Gagal memuat data dari cloud database!");
+                    alert("Gagal memuat data dari server");
                     isScanned = false;
                     initScanner();
                 });
