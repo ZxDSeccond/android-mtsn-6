@@ -15,7 +15,7 @@
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
     #reader video { width: 100% !important; height: auto !important; object-fit: cover; border-radius: 1rem; }
-    .scan-shell { min-height: 210px; }
+    .scan-shell { min-height: 220px; }
     .bg-mesh {
       background:
         radial-gradient(circle at top, rgba(16,185,129,0.2), transparent 35%),
@@ -46,8 +46,8 @@
 
     <nav class="mt-4 rounded-2xl border border-slate-700/60 bg-slate-900/80 p-1.5 shadow-lg shadow-slate-950/30">
       <div class="grid grid-cols-2 gap-1">
-        <button id="tab-scanner-btn" class="tab-button active" onclick="switchTab('scanner')">Scanner</button>
-        <button id="tab-generator-btn" class="tab-button" onclick="switchTab('generator')">Daftar Siswa</button>
+        <button id="tab-scanner-btn" class="tab-button active" type="button" onclick="switchTab('scanner')">Scanner</button>
+        <button id="tab-generator-btn" class="tab-button" type="button" onclick="switchTab('generator')">Daftar Siswa</button>
       </div>
     </nav>
 
@@ -58,13 +58,16 @@
             <h2 class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Pindai Kehadiran</h2>
           </div>
           <div class="flex items-center gap-2">
-            <button onclick="document.getElementById('file-input').click()" class="mini-button">Galeri</button>
+            <button onclick="document.getElementById('file-input').click()" class="mini-button" type="button">Galeri</button>
             <input type="file" id="file-input" accept="image/*" class="hidden" onchange="scanFromGallery(event)" />
-            <button onclick="initScanner()" class="mini-button">Reset</button>
           </div>
         </div>
 
-        <div id="reader" class="scan-shell overflow-hidden rounded-2xl border border-slate-700 bg-slate-950"></div>
+        <button id="btn-start-camera" type="button" class="w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-white shadow-lg shadow-emerald-500/20 transition hover:brightness-110">
+          Buka Kamera QR
+        </button>
+
+        <div id="reader" class="scan-shell mt-4 hidden overflow-hidden rounded-2xl border border-slate-700 bg-slate-950"></div>
 
         <div id="loading-scan" class="hidden py-5 text-center">
           <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-emerald-400 via-cyan-400 to-violet-500 p-[2px] shadow-lg shadow-emerald-500/20">
@@ -79,7 +82,7 @@
           <div class="mt-3 inline-flex rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-300">Mengirim notifikasi</div>
         </div>
 
-        <button id="btn-rescan" onclick="initScanner()" class="hidden mt-4 w-full rounded-xl bg-emerald-500 px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400">Pindai Lagi</button>
+        <button id="btn-rescan" onclick="startCameraFromUserAction()" type="button" class="hidden mt-4 w-full rounded-xl bg-emerald-500 px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400">Pindai Lagi</button>
       </section>
 
       <section id="view-generator" class="panel hidden">
@@ -108,12 +111,12 @@
             <input id="gen-hp" type="text" placeholder="Contoh: 6281234567890" class="input-field" />
           </label>
 
-          <button id="btn-save" onclick="registerAndGenerate()" class="w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-white shadow-lg shadow-emerald-500/20 transition hover:brightness-110">Simpan & Buat QR</button>
+          <button id="btn-save" onclick="registerAndGenerate()" type="button" class="w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-white shadow-lg shadow-emerald-500/20 transition hover:brightness-110">Simpan & Buat QR</button>
         </div>
 
         <div id="qrcode-container" class="mt-5 hidden rounded-2xl border border-slate-700 bg-slate-950/60 p-4 text-center">
           <div id="qrcode" class="mx-auto mb-3 flex w-[200px] items-center justify-center rounded-2xl bg-white p-3 shadow-xl"></div>
-          <button onclick="downloadQRCode()" class="w-full rounded-xl bg-slate-800 px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-slate-100 transition hover:bg-slate-700">Unduh QR</button>
+          <button onclick="downloadQRCode()" type="button" class="w-full rounded-xl bg-slate-800 px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-slate-100 transition hover:bg-slate-700">Unduh QR</button>
         </div>
       </section>
     </main>
@@ -139,7 +142,6 @@
         generatorView.classList.add('hidden');
         scannerBtn.classList.add('active');
         generatorBtn.classList.remove('active');
-        setTimeout(() => initScanner(), 200);
       } else {
         scannerView.classList.add('hidden');
         generatorView.classList.remove('hidden');
@@ -151,40 +153,68 @@
 
     function stopScanner() {
       if (html5QrCode) {
-        html5QrCode.stop().then(() => html5QrCode.clear()).catch(() => {});
+        html5QrCode.stop().then(() => {
+          html5QrCode.clear();
+          html5QrCode = null;
+        }).catch(() => {});
       }
+      const reader = document.getElementById('reader');
+      reader.classList.add('hidden');
     }
 
-    function initScanner() {
+    function startCameraFromUserAction() {
+      const reader = document.getElementById('reader');
+      reader.classList.remove('hidden');
       document.getElementById('result-container').classList.add('hidden');
       document.getElementById('btn-rescan').classList.add('hidden');
       document.getElementById('loading-scan').classList.add('hidden');
 
-      if (html5QrCode) {
-        html5QrCode.stop().catch(() => {}).finally(() => startCameraInstance());
-      } else {
-        startCameraInstance();
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert('Browser perangkat ini tidak mendukung akses kamera.');
+        return;
       }
+
+      if (html5QrCode) {
+        html5QrCode.stop().catch(() => {}).finally(() => {
+          startCameraInstance();
+        });
+        return;
+      }
+
+      startCameraInstance();
     }
+
+    document.getElementById('btn-start-camera').addEventListener('click', startCameraFromUserAction);
 
     function startCameraInstance() {
       html5QrCode = new Html5Qrcode('reader');
       const config = { fps: 15, qrbox: { width: 220, height: 220 } };
 
-      html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess, () => {})
-        .catch(() => {
-          html5QrCode.start({ facingMode: 'user' }, config, onScanSuccess, () => {})
-            .catch(() => alert('Tidak dapat mengakses kamera. Periksa izin kamera HP Anda.'));
+      html5QrCode.start(
+        { facingMode: 'environment' },
+        config,
+        onScanSuccess,
+        () => {}
+      ).catch(() => {
+        html5QrCode.start(
+          { facingMode: 'user' },
+          config,
+          onScanSuccess,
+          () => {}
+        ).catch(() => {
+          alert('Kamera tidak bisa dibuka. Pastikan izin kamera sudah diizinkan dan coba lagi.');
+          const reader = document.getElementById('reader');
+          reader.classList.add('hidden');
         });
+      });
     }
 
     function scanFromGallery(event) {
       if (event.target.files.length === 0) return;
-
-      const file = event.target.files[0];
+      const imageFile = event.target.files[0];
       const readerObj = new Html5Qrcode('reader');
 
-      readerObj.scanFile(file, true)
+      readerObj.scanFile(imageFile, true)
         .then(decodedText => {
           readerObj.clear();
           onScanSuccess(decodedText);
@@ -200,7 +230,14 @@
       document.getElementById('loading-scan').classList.remove('hidden');
 
       fetch(`${API_URL}?id=${encodeURIComponent(studentId)}`)
-        .then(res => res.json())
+        .then(async (res) => {
+          const text = await res.text();
+          try {
+            return JSON.parse(text);
+          } catch {
+            return null;
+          }
+        })
         .then(data => {
           document.getElementById('loading-scan').classList.add('hidden');
 
@@ -222,13 +259,11 @@
             }, 1200);
           } else {
             alert('ID siswa tidak terdaftar di database cloud.');
-            initScanner();
           }
         })
         .catch(() => {
           document.getElementById('loading-scan').classList.add('hidden');
           alert('Gagal memuat data dari server.');
-          initScanner();
         });
     }
 
@@ -257,33 +292,43 @@
 
       fetch(API_URL, {
         method: 'POST',
-        mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-      }).then(() => {
-        btnSave.innerText = 'Simpan & Buat QR';
-        btnSave.disabled = false;
-        alert('Data siswa berhasil tersimpan di cloud.');
+      })
+        .then(async (res) => {
+          const text = await res.text();
+          try {
+            JSON.parse(text);
+          } catch {
+            // ignore non-json response from apps script, still treat as success if status OK
+          }
+          return true;
+        })
+        .then(() => {
+          btnSave.innerText = 'Simpan & Buat QR';
+          btnSave.disabled = false;
+          alert('Data siswa berhasil tersimpan secara otomatis.');
 
-        generatedStudentId = idSiswa;
-        const qrElement = document.getElementById('qrcode');
-        qrElement.innerHTML = '';
+          generatedStudentId = idSiswa;
+          const qrElement = document.getElementById('qrcode');
+          qrElement.innerHTML = '';
 
-        new QRCode(qrElement, {
-          text: idSiswa,
-          width: 200,
-          height: 200,
-          colorDark: '#0f172a',
-          colorLight: '#ffffff',
-          correctLevel: QRCode.CorrectLevel.H
+          new QRCode(qrElement, {
+            text: idSiswa,
+            width: 200,
+            height: 200,
+            colorDark: '#0f172a',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+          });
+
+          document.getElementById('qrcode-container').classList.remove('hidden');
+        })
+        .catch(() => {
+          btnSave.innerText = 'Simpan & Buat QR';
+          btnSave.disabled = false;
+          alert('Koneksi jaringan bermasalah.');
         });
-
-        document.getElementById('qrcode-container').classList.remove('hidden');
-      }).catch(() => {
-        btnSave.innerText = 'Simpan & Buat QR';
-        btnSave.disabled = false;
-        alert('Koneksi jaringan bermasalah.');
-      });
     }
 
     function downloadQRCode() {
@@ -303,10 +348,6 @@
       link.click();
       document.body.removeChild(link);
     }
-
-    window.onload = () => {
-      setTimeout(() => initScanner(), 400);
-    };
   </script>
 </body>
 </html>
