@@ -13,25 +13,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    signingConfigs {
-        release {
-            if (System.getenv("ANDROID_KEYSTORE") != null && !System.getenv("ANDROID_KEYSTORE").trim().isEmpty()) {
-                storeFile file(System.getenv("ANDROID_KEYSTORE"))
-                storePassword System.getenv("KEYSTORE_PASSWORD")
-                keyAlias System.getenv("KEY_ALIAS")
-                keyPassword System.getenv("KEY_PASSWORD")
-            } else {
-                def debugKeystore = file("${System.getProperty('user.home')}/.android/debug.keystore")
-                if (debugKeystore.exists()) {
-                    storeFile debugKeystore
-                    storePassword "android"
-                    keyAlias "androiddebugkey"
-                    keyPassword "android"
-                }
-            }
-        }
-    }
-
     buildTypes {
         debug {
             debuggable true
@@ -39,7 +20,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
         }
     }
 }

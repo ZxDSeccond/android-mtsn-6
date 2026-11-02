@@ -1,4 +1,4 @@
-name: Build Android Release APK/AAB
+name: Build Android Debug APK
 
 on:
   push:
@@ -9,11 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      KEYSTORE_BASE64: ${{ secrets.keystore_base64 }}
-      KEYSTORE_PASSWORD: ${{ secrets.keystore_password }}
-      KEY_ALIAS: ${{ secrets.key_alias }}
-      KEY_PASSWORD: ${{ secrets.key_password }}
 
     steps:
       - name: Checkout repository
@@ -65,34 +60,20 @@ jobs:
             "platforms;android-33" \
             "build-tools;33.0.0"
 
-      - name: Decode release keystore
-        shell: bash
-        run: |
-          set -euxo pipefail
-          if [ -n "$KEYSTORE_BASE64" ]; then
-            mkdir -p "$RUNNER_TEMP/keystore"
-            echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/keystore/release.keystore"
-            echo "ANDROID_KEYSTORE=$RUNNER_TEMP/keystore/release.keystore" >> "$GITHUB_ENV"
-          fi
-
       - name: Make gradlew executable
         working-directory: android
         run: chmod +x ./gradlew
 
-      - name: Build APK
+      - name: Build Debug APK
         working-directory: android
         env:
           ANDROID_HOME: ${{ github.workspace }}/android-sdk
           ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
-          ANDROID_KEYSTORE: ${{ env.ANDROID_KEYSTORE }}
-          KEYSTORE_PASSWORD: ${{ secrets.keystore_password }}
-          KEY_ALIAS: ${{ secrets.key_alias }}
-          KEY_PASSWORD: ${{ secrets.key_password }}
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleDebug
 
-      - name: Upload APK artifact
+      - name: Upload Debug APK artifact
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: release-apk
-          path: android/app/build/outputs/apk/release/*.apk
+          name: debug-apk
+          path: android/app/build/outputs/apk/debug/*.apk
