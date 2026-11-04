@@ -2,7 +2,7 @@ name: Build Android APK Pure Gradle
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
 
 jobs:
   build:
@@ -15,23 +15,43 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: temurin
+          java-version: "17"
 
+      # Override default action packages: default-nya menyertakan package
+      # "tools", yang tidak ditemukan oleh sdkmanager di runner saat ini.
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: 'platform-tools platforms;android-33 build-tools;33.0.2'
+          packages: "platform-tools"
+
+      - name: Install Android SDK packages
+        shell: bash
+        run: |
+          sdkmanager --install \
+            "platforms;android-33" \
+            "build-tools;33.0.2"
 
       - name: Copy Web Files to Android Assets
         shell: bash
         run: |
-          mkdir -p android/app/src/main/assets/public
+          if [ -d "android" ]; then
+            ANDROID_DIR="android"
+          elif [ -d "android-mtsn-6/android" ]; then
+            ANDROID_DIR="android-mtsn-6/android"
+          else
+            echo "::error::Folder Android tidak ditemukan"
+            exit 1
+          fi
+
+          mkdir -p "$ANDROID_DIR/app/src/main/assets/public"
 
           if [ -d "www" ]; then
-            cp -r www/* android/app/src/main/assets/public/
+            cp -R www/. "$ANDROID_DIR/app/src/main/assets/public/"
           elif [ -d "android-mtsn-6/www" ]; then
-            cp -r android-mtsn-6/www/* android/app/src/main/assets/public/
+            cp -R android-mtsn-6/www/. "$ANDROID_DIR/app/src/main/assets/public/"
+          else
+            echo "Folder www tidak ditemukan; melewati penyalinan web assets."
           fi
 
       - name: Build APK with Gradle
@@ -41,13 +61,17 @@ jobs:
             cd android
           elif [ -d "android-mtsn-6/android" ]; then
             cd android-mtsn-6/android
+          else
+            echo "::error::Folder Android tidak ditemukan"
+            exit 1
           fi
 
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: apk-debug-mtsn6
-          path: '**/android/app/build/outputs/apk/debug/app-debug.apk'
+          path: "**/android/app/build/outputs/apk/debug/app-debug.apk"
+          if-no-files-found: error
