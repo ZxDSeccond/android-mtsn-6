@@ -20,15 +20,8 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-
-      - name: Install Android SDK packages
-        shell: bash
-        run: |
-          yes | sdkmanager --licenses
-          sdkmanager --install \
-            "platform-tools" \
-            "platforms;android-33" \
-            "build-tools;33.0.2"
+        with:
+          packages: 'platform-tools platforms;android-33 build-tools;33.0.2'
 
       - name: Copy Web Files to Android Assets
         shell: bash
