@@ -1,829 +1,380 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#0f172a" />
-  <title>Absensi MTsN 6 Solok</title>
-
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/dist/html5-qrcode.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-  <style>
-    :root {
-      --bg: #020817;
-      --panel: #0f172a;
-      --panel-soft: #111827;
-      --line: #334155;
-      --text: #e2e8f0;
-      --muted: #94a3b8;
-      --green: #10b981;
-      --green-2: #34d399;
-      --cyan: #22d3ee;
-      --danger: #ef4444;
-      --shadow: rgba(15, 23, 42, 0.7);
-    }
-
-    * { box-sizing: border-box; }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
-      min-height: 100%;
-    }
-
-    body {
-      background:
-        radial-gradient(circle at top, rgba(16,185,129,0.15), transparent 30%),
-        radial-gradient(circle at bottom right, rgba(34,211,238,0.12), transparent 35%),
-        var(--bg);
-    }
-
-    .app {
-      max-width: 440px;
-      margin: 0 auto;
-      min-height: 100vh;
-      padding: 16px 14px 28px;
-    }
-
-    .header {
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      border-radius: 22px;
-      padding: 12px 14px;
-      box-shadow: 0 12px 28px rgba(2,6,23,0.35);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-
-    .header-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .logo {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      color: #052e16;
-      background: linear-gradient(135deg, #34d399, #22d3ee);
-      box-shadow: 0 8px 20px rgba(52, 211, 153, 0.35);
-    }
-
-    .title {
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      margin: 0;
-    }
-
-    .subtitle {
-      margin: 2px 0 0 0;
-      color: #34d399;
-      font-size: 10px;
-      letter-spacing: 0.08em;
-    }
-
-    .status {
-      border: 1px solid rgba(52, 211, 153, 0.3);
-      background: rgba(16, 185, 129, 0.08);
-      color: #a7f3d0;
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      padding: 6px 8px;
-      border-radius: 999px;
-    }
-
-    .tabs {
-      margin-top: 16px;
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      border-radius: 18px;
-      padding: 6px;
-    }
-
-    .tabs-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-    }
-
-    .tab-btn {
-      border: 0;
-      outline: 0;
-      background: transparent;
-      color: #cbd5e1;
-      padding: 12px 8px;
-      border-radius: 12px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-size: 11px;
-      transition: 0.2s ease;
-    }
-
-    .tab-btn.active {
-      background: linear-gradient(135deg, #10b981, #06b6d4);
-      color: white;
-      box-shadow: 0 10px 22px rgba(16, 185, 129, 0.25);
-    }
-
-    .panel {
-      margin-top: 16px;
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      border-radius: 22px;
-      padding: 16px;
-      box-shadow: 0 12px 28px rgba(2,6,23,0.3);
-    }
-
-    .hidden { display: none !important; }
-
-    .label {
-      display: block;
-      margin-bottom: 8px;
-      color: #cbd5e1;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .input {
-      width: 100%;
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      background: rgba(15, 23, 42, 0.7);
-      color: #f8fafc;
-      border-radius: 14px;
-      padding: 12px 14px;
-      font-size: 14px;
-      outline: none;
-    }
-
-    .input::placeholder { color: #64748b; }
-
-    .input:focus {
-      border-color: rgba(52, 211, 153, 0.8);
-      box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.15);
-    }
-
-    .space-y > * + * { margin-top: 14px; }
-
-    .btn {
-      width: 100%;
-      border: 0;
-      border-radius: 16px;
-      padding: 14px 16px;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      font-size: 11px;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
-
-    .btn:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #10b981, #06b6d4);
-      color: white;
-      box-shadow: 0 12px 22px rgba(16,185,129,0.25);
-    }
-
-    .btn-secondary {
-      background: rgba(51,65,85,0.85);
-      color: white;
-    }
-
-    .scan-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .mini-btn {
-      border: 0;
-      background: rgba(71,85,105,0.8);
-      color: #f8fafc;
-      border-radius: 12px;
-      padding: 9px 12px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-size: 10px;
-      cursor: pointer;
-    }
-
-    .scan-box {
-      width: 100%;
-      min-height: 220px;
-      border-radius: 18px;
-      overflow: hidden;
-      background: #020817;
-      border: 1px solid rgba(148,163,184,0.25);
-      position: relative;
-    }
-
-    #reader video {
-      width: 100% !important;
-      height: auto !important;
-      border-radius: 18px;
-      display: block;
-      object-fit: cover;
-      max-height: 420px;
-    }
-
-    .loading-box {
-      display: none;
-      text-align: center;
-      padding: 20px 8px 8px;
-    }
-
-    .loading-box.show {
-      display: block;
-    }
-
-    .spinner-core {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #34d399, #22d3ee);
-      margin: 0 auto 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: pulse 1.1s infinite ease-in-out;
-    }
-
-    .spinner-core::before {
-      content: "";
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: #020817;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 0.8; }
-      50% { transform: scale(1.08); opacity: 1; }
-      100% { transform: scale(1); opacity: 0.8; }
-    }
-
-    .result-box {
-      display: none;
-      margin-top: 16px;
-      border-radius: 16px;
-      background: rgba(16,185,129,.09);
-      border: 1px solid rgba(52,211,153,.35);
-      padding: 16px;
-      text-align: center;
-    }
-
-    .result-box.show { display: block; }
-
-    .result-title {
-      color: #a7f3d0;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-size: 11px;
-    }
-
-    .result-text {
-      margin-top: 10px;
-      color: #e2e8f0;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-    .qr-wrap {
-      margin-top: 18px;
-      border: 1px solid rgba(148,163,184,0.25);
-      border-radius: 18px;
-      background: rgba(15, 23, 42, 0.6);
-      padding: 16px;
-      text-align: center;
-    }
-
-    #qrcode {
-      width: 200px;
-      height: 200px;
-      margin: 0 auto 14px;
-      background: #fff;
-      border-radius: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 10px;
-      box-shadow: 0 12px 24px rgba(0,0,0,0.2);
-    }
-
-    .footer {
-      margin-top: 22px;
-      text-align: center;
-      color: #64748b;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      font-size: 9px;
-    }
-
-    .error-box {
-      margin-top: 14px;
-      display: none;
-      border: 1px solid rgba(239,68,68,.45);
-      background: rgba(239,68,68,.08);
-      color: #fecaca;
-      border-radius: 14px;
-      padding: 10px 12px;
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
-    .error-box.show { display: block; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absensi Supabase - MTsN 6 Solok</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Tambahan library jsQR untuk membaca gambar galeri secara akurat -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        #reader video { width: 100% !important; height: auto !important; object-fit: cover; border-radius: 0.75rem; }
+        @keyframes rgb-spin {
+            0% { transform: rotate(0deg); filter: hue-rotate(0deg); }
+            50% { transform: rotate(180deg); filter: hue-rotate(180deg); }
+            100% { transform: rotate(360deg); filter: hue-rotate(360deg); }
+        }
+        .rgb-loader {
+            animation: rgb-spin 1.5s linear infinite;
+            background: linear-gradient(135deg, #10b981, #3b82f6, #ec4899, #8b5cf6, #10b981);
+            background-size: 300% 300%;
+        }
+    </style>
 </head>
-<body>
-  <div class="app">
-    <header class="header">
-      <div class="header-inner">
-        <div class="brand">
-          <div class="logo">M</div>
-          <div>
-            <p class="title">MTsN 6 Solok</p>
-            <p class="subtitle">Sistem Absensi Digital</p>
-          </div>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+
+    <!-- Header -->
+    <header class="w-full bg-slate-900 border-b border-slate-800 sticky top-0 z-40 shadow-lg">
+        <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-slate-950 font-extrabold shadow-lg shadow-emerald-500/20">
+                    ZxD
+            
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold text-white tracking-wide">MTsN 6 SOLOK</h1>
+                    <p class="text-[11px] text-emerald-400 font-medium">Supabase Cloud Database</p>
+                </div>
+            </div>
+            <span class="text-[10px] bg-emerald-500/10 text-emerald-400 font-semibold px-2.5 py-1 rounded-full border border-emerald-500/20">
+                Connected
+            </span>
         </div>
-        <span class="status">Online</span>
-      </div>
     </header>
 
-    <nav class="tabs">
-      <div class="tabs-grid">
-        <button class="tab-btn active" type="button" data-tab="scanner">Scanner</button>
-        <button class="tab-btn" type="button" data-tab="generator">Daftar Siswa</button>
-      </div>
-    </nav>
+    <!-- Tab Navigasi -->
+    <div class="max-w-md w-full mx-auto px-4 mt-4">
+        <div class="bg-slate-900 p-1 rounded-lg flex border border-slate-800 shadow-inner">
+            <button onclick="switchTab('scanner')" id="tab-scanner-btn" class="flex-1 py-2.5 text-xs font-bold rounded-md bg-emerald-600 text-white shadow-md transition-all">
+                Scanner Kehadiran
+            </button>
+            <button onclick="switchTab('generator')" id="tab-generator-btn" class="flex-1 py-2.5 text-xs font-semibold rounded-md text-slate-400 hover:text-white transition-all">
+                Pendaftaran Siswa
+            </button>
+        </div>
+    </div>
 
-    <main>
-      <section id="view-scanner" class="panel">
-        <div class="scan-header">
-          <div style="color:#94a3b8;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;">
-            Pindai Kehadiran
-          </div>
-          <div>
-            <button type="button" class="mini-btn" id="btn-gallery">Galeri</button>
-            <input type="file" id="file-input" accept="image/*" class="hidden" />
-          </div>
+    <!-- Konten Utama -->
+    <main class="max-w-md w-full mx-auto p-4 flex-1 flex flex-col justify-center">
+        
+        <!-- View Scanner -->
+        <div id="view-scanner" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Pindai Kartu Siswa</h2>
+                <div class="space-x-2">
+                    <button onclick="document.getElementById('file-input').click()" class="text-xs text-teal-400 font-semibold hover:text-teal-300 transition-colors">
+                        Pilih Galeri
+                    </button>
+                    <input type="file" id="file-input" accept="image/*" class="hidden" onchange="scanFromGallery(event)">
+                    <button onclick="initScanner()" class="text-xs text-emerald-400 font-semibold hover:text-emerald-300 transition-colors">
+                        Reset Kamera
+                    </button>
+                </div>
+            </div>
+
+            <div id="reader" class="w-full rounded-xl overflow-hidden border border-slate-800 bg-slate-950 mb-4 min-h-[250px]"></div>
+
+            <div id="loading-scan" class="hidden flex flex-col items-center justify-center py-6 space-y-3">
+                <div class="w-10 h-10 rounded-full rgb-loader p-0.5 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <div class="w-full h-full bg-slate-950 rounded-full"></div>
+                </div>
+                <p class="text-xs text-emerald-400 font-semibold animate-pulse tracking-wide">Mengecek database Supabase...</p>
+            </div>
+
+            <div id="result-container" class="hidden mt-3 p-4 bg-emerald-950/40 border border-emerald-500/30 rounded-xl text-center">
+                <span class="inline-block text-emerald-400 font-bold text-sm mb-1">Absensi Berhasil Tercatat</span>
+                <p id="student-info" class="text-xs text-slate-300 mb-3 font-medium leading-relaxed"></p>
+                <div class="inline-flex items-center text-xs text-emerald-300 font-semibold bg-emerald-900/40 px-3 py-1.5 rounded-lg border border-emerald-500/20">
+                    Mengarahkan ke WhatsApp Orang Tua...
+                </div>
+            </div>
+
+            <button id="btn-rescan" onclick="initScanner()" class="hidden mt-3 w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-3 px-4 rounded-xl shadow-lg shadow-emerald-600/20 transition-all">
+                Pindai Siswa Lain
+            </button>
         </div>
 
-        <button type="button" class="btn btn-primary" id="btn-start-camera">Buka Kamera QR</button>
-        <div id="reader" class="scan-box hidden" aria-live="polite"></div>
+        <!-- View Generator -->
+        <div id="view-generator" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl hidden">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Registrasi Siswa ke Supabase</h2>
+            
+            <div class="space-y-3.5 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-300 mb-1.5">ID / NISN Unik</label>
+                    <input type="text" id="gen-id" placeholder="Contoh: M6-001" class="w-full px-3.5 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-300 mb-1.5">Nama Lengkap Siswa</label>
+                    <input type="text" id="gen-nama" placeholder="Contoh: Zidan Ramadan" class="w-full px-3.5 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-300 mb-1.5">Kelas</label>
+                    <input type="text" id="gen-kelas" placeholder="Contoh: IX-A" class="w-full px-3.5 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-300 mb-1.5">No. WhatsApp Orang Tua</label>
+                    <input type="text" id="gen-hp" placeholder="Contoh: 6281234567890" class="w-full px-3.5 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                </div>
+                <button onclick="registerAndGenerate()" id="btn-save" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-600/20 transition-all mt-2">
+                    Simpan Supabase & Buat QR
+                </button>
+            </div>
 
-        <div id="loading-scan" class="loading-box">
-          <div class="spinner-core"></div>
-          <div style="color:#34d399;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;">
-            Menyinkronkan data
-          </div>
+            <div id="qrcode-container" class="mt-5 flex flex-col items-center hidden pt-4 border-t border-slate-800">
+                <div id="qrcode" class="p-3 bg-white rounded-xl shadow-xl mb-3 flex justify-center items-center"></div>
+                <button onclick="downloadQRCode()" class="w-full text-center bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold py-3 px-4 rounded-xl shadow cursor-pointer transition-colors">
+                    Unduh Kartu QR (.PNG)
+                </button>
+            </div>
         </div>
 
-        <div id="result-box" class="result-box">
-          <div class="result-title">Berhasil Tercatat</div>
-          <div id="student-info" class="result-text"></div>
-        </div>
-
-        <div id="error-box" class="error-box"></div>
-
-        <button type="button" class="btn btn-secondary hidden" id="btn-rescan" style="margin-top:16px;">
-          Scan Lagi
-        </button>
-      </section>
-
-      <section id="view-generator" class="panel hidden">
-        <div style="color:#94a3b8;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:12px;">
-          Registrasi Siswa
-        </div>
-
-        <div class="space-y">
-          <div>
-            <label class="label">ID / NISN</label>
-            <input id="gen-id" class="input" type="text" placeholder="Contoh: M6-001" />
-          </div>
-
-          <div>
-            <label class="label">Nama Lengkap</label>
-            <input id="gen-nama" class="input" type="text" placeholder="Contoh: Zidan Ramadan" />
-          </div>
-
-          <div>
-            <label class="label">Kelas</label>
-            <input id="gen-kelas" class="input" type="text" placeholder="Contoh: IX-A" />
-          </div>
-
-          <div>
-            <label class="label">No. WhatsApp Orang Tua</label>
-            <input id="gen-hp" class="input" type="text" placeholder="Contoh: 6281234567890" />
-          </div>
-
-          <button type="button" class="btn btn-primary" id="btn-save">Simpan & Buat QR</button>
-        </div>
-
-        <div id="error-box-form" class="error-box"></div>
-
-        <div id="qrcode-wrap" class="qr-wrap hidden">
-          <div id="qrcode"></div>
-          <button type="button" class="btn btn-secondary" id="btn-download-qr">Download QR</button>
-        </div>
-      </section>
     </main>
 
-    <div class="footer">© 2026 ZxD • MTsN 6 Solok</div>
-  </div>
+    <!-- Footer -->
+    <footer class="w-full py-4 text-center text-[11px] text-slate-500 border-t border-slate-800 mt-auto bg-slate-950">
+        &copy; 2026 ZxD &bull; MTsN 6 Solok, Sumatera Barat
+    </footer>
 
-  <script>
-    const SUPABASE_URL = "https://pkbgvpmkjadclogjmyxk.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_o9l7GgAJK_UvVReROKT3Vg_6DGOf7D8";
+    <!-- Skrip Supabase & Logika Aplikasi -->
+    <script>
+        const SUPABASE_URL = "https://pkbgvpmkjadclogjmyxk.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_o9l7GgAJK_UvVReROKT3Vg_6DGOf7D8";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let html5QrCode = null;
-    let generatedStudentId = "";
+        let html5QrCode = null;
 
-    function getSupabaseHeaders() {
-      return {
-        "apikey": SUPABASE_ANON_KEY,
-        "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-        "Content-Type": "application/json",
-        "Prefer": "return=representation"
-      };
-    }
+        function switchTab(tab) {
+            const scannerView = document.getElementById('view-scanner');
+            const generatorView = document.getElementById('view-generator');
+            const scannerBtn = document.getElementById('tab-scanner-btn');
+            const generatorBtn = document.getElementById('tab-generator-btn');
 
-    function showError(message, targetId = "error-box") {
-      const node = document.getElementById(targetId);
-      if (!node) return;
-      node.textContent = message;
-      node.classList.add("show");
-    }
-
-    function clearError(targetId = "error-box") {
-      const node = document.getElementById(targetId);
-      if (!node) return;
-      node.textContent = "";
-      node.classList.remove("show");
-    }
-
-    function setActiveTab(tabName) {
-      const scannerSection = document.getElementById("view-scanner");
-      const generatorSection = document.getElementById("view-generator");
-      const buttons = document.querySelectorAll(".tab-btn");
-
-      buttons.forEach((btn) => {
-        btn.classList.toggle("active", btn.dataset.tab === tabName);
-      });
-
-      if (tabName === "scanner") {
-        scannerSection.classList.remove("hidden");
-        generatorSection.classList.add("hidden");
-        stopScanner();
-      } else {
-        scannerSection.classList.add("hidden");
-        generatorSection.classList.remove("hidden");
-        stopScanner();
-      }
-    }
-
-    function stopScanner() {
-      if (!html5QrCode) return;
-
-      html5QrCode.stop()
-        .then(() => {
-          try { html5QrCode.clear(); } catch (e) {}
-        })
-        .catch(() => {})
-        .finally(() => {
-          html5QrCode = null;
-          const reader = document.getElementById("reader");
-          if (reader) reader.classList.add("hidden");
-        });
-    }
-
-    function showLoading(show) {
-      const loading = document.getElementById("loading-scan");
-      if (!loading) return;
-      loading.classList.toggle("show", show);
-    }
-
-    function hideScanResult() {
-      const resultBox = document.getElementById("result-box");
-      if (resultBox) resultBox.classList.remove("show");
-    }
-
-    function startCameraFromUserAction() {
-      clearError();
-      hideScanResult();
-
-      const reader = document.getElementById("reader");
-      const btnRescan = document.getElementById("btn-rescan");
-
-      if (reader) reader.classList.remove("hidden");
-      if (btnRescan) btnRescan.classList.add("hidden");
-
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert("Browser ini tidak mendukung akses kamera.");
-        return;
-      }
-
-      if (html5QrCode) {
-        html5QrCode.stop().catch(() => {}).finally(() => {
-          startCameraInstance();
-        });
-        return;
-      }
-
-      startCameraInstance();
-    }
-
-    function startCameraInstance() {
-      const reader = document.getElementById("reader");
-      if (!reader) return;
-
-      try {
-        html5QrCode = new Html5Qrcode("reader");
-      } catch (error) {
-        alert("Camera tidak dapat diinisialisasi.");
-        return;
-      }
-
-      const config = { fps: 10, qrbox: { width: 260, height: 260 } };
-
-      html5QrCode.start(
-        { facingMode: "environment" },
-        config,
-        onScanSuccess,
-        () => {}
-      ).catch(() => {
-        html5QrCode.start(
-          { facingMode: "user" },
-          config,
-          onScanSuccess,
-          () => {}
-        ).catch(() => {
-          alert("Kamera tidak bisa dibuka. Pastikan izin kamera sudah diberikan.");
-          if (reader) reader.classList.add("hidden");
-        });
-      });
-    }
-
-    async function onScanSuccess(decodedText) {
-      const studentId = String(decodedText).trim();
-      if (!studentId) return;
-
-      stopScanner();
-      showLoading(true);
-      clearError();
-
-      try {
-        const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/students?id=eq.${encodeURIComponent(studentId)}&select=*`,
-          {
-            method: "GET",
-            headers: getSupabaseHeaders()
-          }
-        );
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error((Array.isArray(data) && data[0] && data[0].message) ? data[0].message : "Query siswa gagal.");
+            if (tab === 'scanner') {
+                scannerView.classList.remove('hidden');
+                generatorView.classList.add('hidden');
+                scannerBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-md bg-emerald-600 text-white shadow-md transition-all";
+                generatorBtn.className = "flex-1 py-2.5 text-xs font-semibold rounded-md text-slate-400 hover:text-white transition-all";
+                setTimeout(() => initScanner(), 200);
+            } else {
+                scannerView.classList.add('hidden');
+                generatorView.classList.remove('hidden');
+                generatorBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-md bg-emerald-600 text-white shadow-md transition-all";
+                scannerBtn.className = "flex-1 py-2.5 text-xs font-semibold rounded-md text-slate-400 hover:text-white transition-all";
+                stopScanner();
+            }
         }
 
-        if (!Array.isArray(data) || data.length === 0) {
-          showLoading(false);
-          alert("ID siswa tidak terdaftar di database.");
-          return;
+        function stopScanner() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                }).catch(err => {
+                    console.log("Stop camera error: ", err);
+                });
+            }
         }
 
-        const student = data[0];
-        const resultBox = document.getElementById("result-box");
-        const studentInfo = document.getElementById("student-info");
+        function initScanner() {
+            document.getElementById("result-container").classList.add("hidden");
+            document.getElementById("btn-rescan").classList.add("hidden");
+            document.getElementById("loading-scan").classList.add("hidden");
 
-        if (studentInfo) {
-          studentInfo.innerHTML =
-            `<strong>${student.name}</strong><br>` +
-            `Kelas: ${student.class} • ID: ${student.id}<br>` +
-            `<span style="color:#a7f3d0;font-weight:700;">Status: Hadir Terverifikasi</span>`;
+            if (html5QrCode) {
+                html5QrCode.stop().catch(() => {}).finally(() => {
+                    startCameraInstance();
+                });
+            } else {
+                startCameraInstance();
+            }
         }
 
-        if (resultBox) resultBox.classList.add("show");
-
-        const btnRescan = document.getElementById("btn-rescan");
-        if (btnRescan) btnRescan.classList.remove("hidden");
-
-        const attendanceResponse = await fetch(`${SUPABASE_URL}/rest/v1/attendance?select=*`, {
-          method: "POST",
-          headers: getSupabaseHeaders(),
-          body: JSON.stringify({
-            student_id: student.id,
-            status: "present",
-            scanned_at: new Date().toISOString()
-          })
-        });
-
-        if (!attendanceResponse.ok) {
-          const attendanceText = await attendanceResponse.text();
-          console.error("Attendance insert failed:", attendanceText);
+        function startCameraInstance() {
+            html5QrCode = new Html5Qrcode("reader");
+            const config = { fps: 15, qrbox: { width: 220, height: 220 } };
+            
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                config, 
+                onScanSuccess, 
+                () => {}
+            ).catch(err => {
+                html5QrCode.start(
+                    { facingMode: "user" }, 
+                    config, 
+                    onScanSuccess, 
+                    () => {}
+                ).catch(innerErr => {
+                    alert("Gagal mengakses kamera perangkat. Periksa izin akses kamera.");
+                });
+            });
         }
 
-        const message = `Assalamu'alaikum, memberitahukan bahwa ananda ${student.name} (${student.class}) telah hadir di MTsN 6 Solok hari ini. Terima kasih.`;
-        const waUrl = `https://api.whatsapp.com/send?phone=${student.phone}&text=${encodeURIComponent(message)}`;
+        // Fungsi Scan dari Galeri menggunakan jsQR (Super akurat untuk screenshot/gambar)
+        function scanFromGallery(event) {
+            if (event.target.files.length === 0) return;
+            const file = event.target.files[0];
+            const reader = new FileReader();
 
-        setTimeout(() => {
-          window.location.href = waUrl;
-        }, 1200);
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0, img.width, img.height);
+                    
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height);
 
-      } catch (error) {
-        console.error(error);
-        showError(`Gagal memproses data siswa. ${error.message || "Silakan cek koneksi dan policy Supabase."}`);
-        alert(`Gagal memproses data siswa. ${error.message || "Silakan cek koneksi dan policy Supabase."}`);
-      } finally {
-        showLoading(false);
-      }
-    }
-
-    async function registerAndGenerate() {
-      clearError("error-box-form");
-
-      const idSiswa = document.getElementById("gen-id").value.trim();
-      const nama = document.getElementById("gen-nama").value.trim();
-      const kelas = document.getElementById("gen-kelas").value.trim();
-      const hp = document.getElementById("gen-hp").value.trim();
-
-      if (!idSiswa || !nama || !kelas || !hp) {
-        alert("Harap lengkapi seluruh data siswa.");
-        return;
-      }
-
-      const btnSave = document.getElementById("btn-save");
-      btnSave.disabled = true;
-      btnSave.textContent = "Menyimpan...";
-
-      const payload = {
-        id: idSiswa,
-        name: nama,
-        class: kelas,
-        phone: hp
-      };
-
-      try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/students?select=*`, {
-          method: "POST",
-          headers: getSupabaseHeaders(),
-          body: JSON.stringify(payload)
-        });
-
-        const rawText = await response.text();
-        console.log("INSERT STATUS:", response.status);
-        console.log("INSERT RAW RESPONSE:", rawText);
-
-        let parsed = null;
-
-        if (rawText) {
-          try {
-            parsed = JSON.parse(rawText);
-          } catch (e) {
-            parsed = null;
-          }
+                    if (code) {
+                        onScanSuccess(code.data);
+                    } else {
+                        alert("QR Code tidak terdeteksi pada gambar. Pastikan gambar jelas.");
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
-        if (!response.ok) {
-          const errMessage =
-            (parsed && parsed[0] && parsed[0].message) ||
-            rawText ||
-            "Insert gagal";
+        async function onScanSuccess(decodedText) {
+            stopScanner();
 
-          throw new Error(errMessage);
+            let scannedId = decodedText.trim();
+            document.getElementById("loading-scan").classList.remove("hidden");
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('students')
+                    .select('*')
+                    .eq('id_siswa', scannedId)
+                    .single();
+
+                document.getElementById("loading-scan").classList.add("hidden");
+
+                if (data) {
+                    document.getElementById("student-info").innerHTML = `
+                        <strong>${data.nama}</strong><br>
+                        Kelas: ${data.kelas} | ID: ${data.id_siswa}<br>
+                        <span class="text-emerald-400 font-semibold">Status: Terverifikasi Hadir</span>
+                    `;
+
+                    let pesanWA = `Assalamu'alaikum, memberitahukan bahwa ananda ${data.nama} (${data.kelas}) telah hadir di MTsN 6 Solok hari ini. Terima kasih.`;
+                    let waUrl = `https://api.whatsapp.com/send?phone=${data.no_ortu}&text=${encodeURIComponent(pesanWA)}`;
+
+                    document.getElementById("result-container").classList.remove("hidden");
+                    document.getElementById("btn-rescan").classList.remove("hidden");
+
+                    setTimeout(() => {
+                        window.location.href = waUrl;
+                    }, 1200);
+                } else {
+                    alert("ID Siswa tidak terdaftar di database Supabase");
+                    initScanner();
+                }
+            } catch (err) {
+                document.getElementById("loading-scan").classList.add("hidden");
+                alert("Gagal memuat data dari Supabase");
+                initScanner();
+            }
         }
 
-        generatedStudentId = idSiswa;
+        let generatedStudentId = "";
 
-        const qrElement = document.getElementById("qrcode");
-        if (!qrElement) {
-          throw new Error("QR container tidak ditemukan.");
+        async function registerAndGenerate() {
+            let idSiswa = document.getElementById('gen-id').value.trim();
+            let nama = document.getElementById('gen-nama').value.trim();
+            let kelas = document.getElementById('gen-kelas').value.trim();
+            let hp = document.getElementById('gen-hp').value.trim();
+
+            if (!idSiswa || !nama || !kelas || !hp) {
+                alert("Harap lengkapi seluruh data siswa");
+                return;
+            }
+
+            let btnSave = document.getElementById('btn-save');
+            btnSave.innerText = "Menyimpan ke Supabase...";
+            btnSave.disabled = true;
+
+            try {
+                // Menggunakan upsert agar jika ID sama, data diperbarui tanpa error duplicate key
+                const { error } = await supabaseClient
+                    .from('students')
+                    .upsert([
+                        { id_siswa: idSiswa, nama: nama, kelas: kelas, no_ortu: hp }
+                    ]);
+
+                btnSave.innerText = "Simpan Supabase & Buat QR";
+                btnSave.disabled = false;
+
+                if (error) {
+                    alert("Gagal menyimpan: " + error.message);
+                    return;
+                }
+
+                alert("Data siswa berhasil tersimpan ke Supabase!");
+
+                generatedStudentId = idSiswa;
+                let qrElement = document.getElementById('qrcode');
+                qrElement.innerHTML = "";
+
+                new QRCode(qrElement, {
+                    text: idSiswa,
+                    width: 200,
+                    height: 200,
+                    colorDark : "#0f172a",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+
+                document.getElementById('qrcode-container').classList.remove('hidden');
+
+            } catch (err) {
+                btnSave.innerText = "Simpan Supabase & Buat QR";
+                btnSave.disabled = false;
+                alert("Terjadi kesalahan jaringan ke Supabase");
+            }
         }
 
-        qrElement.innerHTML = "";
+        function downloadQRCode() {
+            let qrElement = document.getElementById('qrcode');
+            let img = qrElement.querySelector('img') || qrElement.querySelector('canvas');
+            
+            if (!img) {
+                alert("QR Code belum dirender.");
+                return;
+            }
 
-        new QRCode(qrElement, {
-          text: idSiswa,
-          width: 200,
-          height: 200,
-          colorDark: "#0f172a",
-          colorLight: "#ffffff",
-          correctLevel: QRCode.CorrectLevel.H
-        });
+            let imageUrl = "";
+            if (img.tagName === 'CANVAS') {
+                imageUrl = img.toDataURL("image/png");
+            } else if (img.tagName === 'IMG') {
+                imageUrl = img.src;
+            }
 
-        const wrap = document.getElementById("qrcode-wrap");
-        if (wrap) {
-          wrap.classList.remove("hidden");
+            if (imageUrl) {
+                let downloadLink = document.createElement('a');
+                downloadLink.href = imageUrl;
+                downloadLink.download = `Kartu-QR-${generatedStudentId || 'Siswa'}.png`;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            } else {
+                alert("Gagal mengambil data gambar QR Code.");
+            }
         }
 
-        setTimeout(() => {
-          downloadQRCode(true);
-        }, 250);
-
-        alert("QR berhasil dibuat dan otomatis tersimpan. Silakan buka tab Scanner untuk memindai.");
-      } catch (error) {
-        console.error("REGISTER ERROR:", error);
-
-        const message = error && error.message ? error.message : "Gagal menyimpan data siswa.";
-        showError(`Gagal menyimpan data siswa. ${message}. Pastikan policy insert tabel students di Supabase sudah diizinkan untuk anon/public.`, "error-box-form");
-        alert(`Gagal menyimpan data siswa. ${message}`);
-      } finally {
-        btnSave.disabled = false;
-        btnSave.textContent = "Simpan & Buat QR";
-      }
-    }
-
-    function downloadQRCode(auto = false) {
-      const qrBox = document.getElementById("qrcode");
-      if (!qrBox) return;
-
-      const img = qrBox.querySelector("img") || qrBox.querySelector("canvas");
-      if (!img) {
-        if (!auto) alert("QR Code belum tersedia.");
-        return;
-      }
-
-      const imageUrl = img.tagName === "CANVAS" ? img.toDataURL("image/png") : img.src;
-      const a = document.createElement("a");
-      a.href = imageUrl;
-      a.download = `Kartu-QR-${generatedStudentId || "Siswa"}.png`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-
-    function handleGalleryScan(event) {
-      const file = event.target.files && event.target.files[0];
-      if (!file) return;
-
-      const reader = document.getElementById("reader");
-      if (reader) reader.classList.remove("hidden");
-
-      const tempQr = new Html5Qrcode("reader");
-
-      tempQr.scanFile(file, true)
-        .then((decodedText) => {
-          tempQr.clear();
-          onScanSuccess(decodedText);
-        })
-        .catch(() => {
-          alert("QR Code tidak ditemukan pada gambar yang dipilih.");
-        })
-        .finally(() => {
-          event.target.value = "";
-        });
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-      document.querySelectorAll(".tab-btn").forEach((button) => {
-        button.addEventListener("click", function () {
-          setActiveTab(this.dataset.tab);
-        });
-      });
-
-      document.getElementById("btn-start-camera").addEventListener("click", startCameraFromUserAction);
-      document.getElementById("btn-rescan").addEventListener("click", startCameraFromUserAction);
-      document.getElementById("btn-save").addEventListener("click", registerAndGenerate);
-      document.getElementById("btn-download-qr").addEventListener("click", function () {
-        downloadQRCode(false);
-      });
-      document.getElementById("btn-gallery").addEventListener("click", function () {
-        document.getElementById("file-input").click();
-      });
-      document.getElementById("file-input").addEventListener("change", handleGalleryScan);
-    });
-  </script>
+        window.onload = () => {
+            setTimeout(() => {
+                initScanner();
+            }, 500);
+        };
+    </script>
 </body>
 </html>
